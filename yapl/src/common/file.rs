@@ -1,11 +1,13 @@
 use std::path::PathBuf;
 
+#[allow(unused)]
 pub struct Context {
     pub file: PathBuf,
     pub lines: Vec<String>,
 }
 
 impl Context {
+    #[allow(unused)]
     fn new_read(file: PathBuf) -> Result<Self, Error> {
         match std::fs::read_to_string(&file) {
             Ok(s) => {
@@ -71,7 +73,7 @@ impl PartialOrd for Span {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Error {
     // To be done: file.
     // To be done: kind.
@@ -85,6 +87,7 @@ impl Error {
     }
 }
 
+#[allow(unused)]
 pub struct ErrorC<'a> {
     pub error: Error,
     pub context: &'a Context,

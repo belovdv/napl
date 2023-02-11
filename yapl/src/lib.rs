@@ -4,6 +4,6 @@ pub mod parser;
 
 mod common;
 
-pub fn yapl() {}
+pub use parser::parse;
 
-// TODO: standardized list of errors.
+pub use common::file::Context;

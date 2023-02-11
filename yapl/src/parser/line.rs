@@ -38,7 +38,10 @@ impl<'a> Parser<'a> {
 
         let mut statements = Vec::new();
         while let Some(&c) = self.chars.peek() {
-            statements.push(self.parse_statement(c)?)
+            let next = self.parse_statement(c)?;
+            if !matches!(next.0, Statement::None) {
+                statements.push(next)
+            }
         }
 
         if statements.len() == 0 {
@@ -63,7 +66,8 @@ impl<'a> Parser<'a> {
             SymbolType::Digit(_) => wrap_unit!(int, self, LitInt),
             SymbolType::Special(_) => wrap_unit!(special, self, Special),
             SymbolType::Inner => self.parse_inner(),
-            SymbolType::Bracket(bt, open) => self.parse_bracket(bt, open),
+            SymbolType::Bracket(bt, true) => Ok(self.parse_bracket(bt)?),
+            SymbolType::Bracket(_, false) => Err("unexpected closing bracket".to_string()),
         };
         let size = self.chars.taken() as u8;
         let span = Span::new_p(self.pos, size);
@@ -98,7 +102,56 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn parse_bracket(&mut self, t: BracketType, is_open: bool) -> Result<Statement, String> {
-        todo!()
+    fn parse_bracket(&mut self, t: BracketType) -> Result<Statement, Error> {
+        self.chars.next().unwrap();
+        let mut parts = Vec::new();
+        let mut sent = Vec::new();
+        let mut sent_pos = self.pos;
+        loop {
+            let next = self.chars.peek().map(|&c| c);
+            match SymbolType::from(next) {
+                SymbolType::Bracket(ct, false) => {
+                    if t == ct {
+                        self.chars.next().unwrap();
+                        if sent.len() != 0 {
+                            parts.push(Sentence {
+                                statements: sent,
+                                span: Span::new_p(sent_pos, self.pos.offset - sent_pos.offset),
+                            });
+                        }
+                        return Ok(Statement::Bracket((t, parts)));
+                    } else {
+                        return Err(Error::new(
+                            "wrong closing bracket".to_string(),
+                            Span::new_p(sent_pos, self.pos.offset - sent_pos.offset),
+                        ));
+                    }
+                }
+                SymbolType::Comma => {
+                    self.chars.next().unwrap();
+                    if sent.len() == 0 {
+                        return Err(Error::new(
+                            "empty last part".to_string(),
+                            Span::new_p(sent_pos, self.pos.offset - sent_pos.offset),
+                        ));
+                    }
+                    parts.push(Sentence {
+                        statements: sent,
+                        span: Span::new_p(
+                            sent_pos,
+                            self.pos.offset - sent_pos.offset - sent_pos.offset,
+                        ),
+                    });
+                    sent_pos = self.pos;
+                    sent = Vec::new();
+                }
+                _ => {
+                    let next = self.parse_statement(next.unwrap())?;
+                    if !matches!(next.0, Statement::None) {
+                        sent.push(next)
+                    }
+                }
+            }
+        }
     }
 }

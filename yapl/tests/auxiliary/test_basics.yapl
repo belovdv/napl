@@ -1,0 +1,12 @@
+# simplest test
+
+fn func() -> (T)
+        # inner
+        fn <-- is simple
+    let a 3 (is a "hello world \t \n \\ \" ok? ")
+    for i in std.range.range(4)
+        do something
+                maybe it will help
+            extend (doing [1 + 2345])
+            extend doing 2
+    return

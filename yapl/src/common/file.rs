@@ -1,14 +1,12 @@
 use std::{fmt::Debug, path::PathBuf};
 
-#[allow(unused)]
 pub struct Context {
     pub file: PathBuf,
     pub lines: Vec<String>,
 }
 
 impl Context {
-    #[allow(unused)]
-    fn new_read(file: PathBuf) -> Result<Self, Error> {
+    pub fn new_read(file: PathBuf) -> Result<Self, Error> {
         match std::fs::read_to_string(&file) {
             Ok(s) => {
                 let lines: Vec<_> = s.lines().map(|l| l.to_string()).collect();
@@ -114,10 +112,4 @@ impl Error {
     pub fn new(message: String, span: Span) -> Self {
         Self { message, span }
     }
-}
-
-#[allow(unused)]
-pub struct ErrorC<'a> {
-    pub error: Error,
-    pub context: &'a Context,
 }

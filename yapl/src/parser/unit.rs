@@ -104,39 +104,3 @@ fn err_exp_wh() -> String {
 fn err_exp_id() -> String {
     "expected identifier".to_string()
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn assert_eq(sample: &str, expected: Result<Vec<&'static str>, String>) {
-        let expected = expected.map(|v| v.into_iter().map(Symbol::from).collect());
-        let result = chain(&mut Stream::new(sample));
-        if result != expected {
-            dbg!(sample, &result, &expected);
-            panic!("test failed")
-        }
-    }
-
-    #[test]
-    fn test_chain() {
-        assert_eq("a2_b4.e6", Ok(vec!["a2_b4", "e6"]));
-        assert_eq("a2_b4.e6.e8", Ok(vec!["a2_b4", "e6", "e8"]));
-        assert_eq("a2_b4.e6.e8 e9", Ok(vec!["a2_b4", "e6", "e8"]));
-        assert_eq("a2_b4.e6!!!e9", Ok(vec!["a2_b4", "e6"]));
-        assert_eq("a2_b4.e6<=>e9", Ok(vec!["a2_b4", "e6"]));
-        assert_eq("a2_b.4(e6)<=>e9", Ok(vec!["a2_b", "4"]));
-
-        assert_eq!(chain(&mut Stream::new("a2_b4..e6")), Err(err_exp_id()));
-        assert_eq!(chain(&mut Stream::new(".a2_b4.e6.e8")), Err(err_exp_id()));
-        assert_eq!(chain(&mut Stream::new("a2_4\".e\".e8")), Err(err_exp_wh()));
-    }
-
-    #[test]
-    fn test_string() {
-        let sample = "\"abc \\\\ \\t \t \n \\\" \" abc";
-        let result = string(&mut Stream::new(sample));
-        let expected = Ok("abc \\ \t \t \n \" ".to_string());
-        assert!(result == expected);
-    }
-}

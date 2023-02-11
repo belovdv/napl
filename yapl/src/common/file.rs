@@ -17,7 +17,10 @@ impl Context {
                 } else if let Some(long) = lines.iter().position(|l| l.len() > 200) {
                     Err(Error::new(
                         "too long line".to_string(),
-                        Span::new(long as u16, 0, lines[long].len() as u8),
+                        Span::new(
+                            Position::new(long as u16, 0),
+                            Position::new(long as u16, lines[long].len() as u8),
+                        ),
                     ))
                 } else {
                     Ok(Self { file, lines })
@@ -31,45 +34,57 @@ impl Context {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Position {
     pub line: u16,
     pub offset: u8,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
-pub struct Span {
-    pub line: u16,
-    pub begin: u8,
-    pub length: u8,
-}
-
-impl Span {
-    fn new(line: u16, begin: u8, length: u8) -> Self {
-        Self {
-            line,
-            begin,
-            length,
-        }
+impl Position {
+    pub fn new(line: u16, offset: u8) -> Self {
+        Self { line, offset }
     }
-    pub fn new_p(position: Position, length: u8) -> Self {
-        Self {
-            line: position.line,
-            begin: position.offset,
-            length,
-        }
+
+    pub fn mov(&mut self, rhs: u8) {
+        self.offset += rhs
     }
 }
 
-impl PartialOrd for Span {
+impl PartialOrd for Position {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         if self.line != other.line {
             self.line.partial_cmp(&other.line)
-        } else if self.line != other.line {
-            self.begin.partial_cmp(&other.begin)
         } else {
-            self.length.partial_cmp(&other.length)
+            self.offset.partial_cmp(&other.offset)
         }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct Span {
+    pub begin: Position,
+    pub end: Position,
+    pub _private: (),
+}
+
+impl Span {
+    pub fn new(begin: Position, end: Position) -> Self {
+        assert!(begin <= end);
+        Self {
+            begin,
+            end,
+            _private: (),
+        }
+    }
+    pub fn new_p(position: Position, length: u8) -> Self {
+        Self::new(
+            position,
+            Position::new(position.line, position.offset + length),
+        )
+    }
+
+    pub fn new_s(line: u16, begin: u8, end: u8) -> Self {
+        Self::new(Position::new(line, begin), Position::new(line, end))
     }
 }
 

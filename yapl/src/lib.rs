@@ -1,10 +1,7 @@
 // pub should be removed
 pub mod ast;
-pub mod lexer;
+pub mod parser;
 
 mod common;
 
 pub fn yapl() {}
-
-#[cfg(test)]
-mod tests;

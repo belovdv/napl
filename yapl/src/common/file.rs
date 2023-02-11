@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{fmt::Debug, path::PathBuf};
 
 #[allow(unused)]
 pub struct Context {
@@ -60,7 +60,7 @@ impl PartialOrd for Position {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
+#[derive(Clone, Copy, PartialEq, Default)]
 pub struct Span {
     pub begin: Position,
     pub end: Position,
@@ -85,6 +85,20 @@ impl Span {
 
     pub fn new_s(line: u16, begin: u8, end: u8) -> Self {
         Self::new(Position::new(line, begin), Position::new(line, end))
+    }
+}
+
+impl Debug for Span {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // f.debug_struct("Span")
+        //     .field("begin", &self.begin)
+        //     .field("end", &self.end)
+        //     .finish()
+
+        f.write_fmt(format_args!(
+            "Span ({}, {}):({}, {})",
+            self.begin.line, self.begin.offset, self.end.line, self.end.offset
+        ))
     }
 }
 

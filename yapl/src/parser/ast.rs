@@ -10,7 +10,7 @@ pub struct File {
 }
 
 /// Line in code and its descendants.
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq)] // PartialEq - for tests.
 pub struct Line {
     pub sentence: Sentence,
     pub extension: Vec<Line>,

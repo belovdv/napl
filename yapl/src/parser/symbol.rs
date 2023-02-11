@@ -69,9 +69,8 @@ impl From<char> for SymbolType {
             ')' => Self::Bracket(BracketType::Round, false),
             ']' => Self::Bracket(BracketType::Square, false),
             '}' => Self::Bracket(BracketType::Curly, false),
+            c if "<>+-*/=&|^!'".contains(c) => Self::Special(c),
             ' ' | '\t' => Self::Whitespace(c),
-            // TODO: there is an error somehow...
-            c if "<>+-*/= &|^!'".contains(c) => Self::Special(c),
             '\n' => Self::NewLine,
             _ => Self::Other,
         }

@@ -1,7 +1,6 @@
 use super::ast::{Line, Sentence, Statement};
 use super::stream::Stream;
-use super::symbol;
-use super::symbol::{BracketType, SymbolType};
+use super::symbol::{self, BracketType, SymbolType};
 use super::unit;
 
 use crate::common::file::{Error, Position, Span};
@@ -26,8 +25,16 @@ impl<'a> Parser<'a> {
     }
 
     pub fn parse(&mut self) -> Result<Option<(u8, Line)>, Error> {
-        let offset = self.parse_whitespace();
-        self.pos.mov(self.chars.taken() as u8);
+        let offset_s = self.parse_whitespace();
+        let shift = self.chars.taken() as u8;
+        let offset = offset_s / 4;
+        if offset * 4 != offset_s {
+            return Err(Error::new(
+                "offset is not divisible by 4".to_string(),
+                Span::new_p(self.pos, shift),
+            ));
+        }
+        self.pos.mov(shift);
 
         let mut statements = Vec::new();
         while let Some(&c) = self.chars.peek() {
@@ -93,23 +100,5 @@ impl<'a> Parser<'a> {
 
     fn parse_bracket(&mut self, t: BracketType, is_open: bool) -> Result<Statement, String> {
         todo!()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn parser_initial() {
-        let line = "    let some <=== other.field.4.ok    #   !!! nonsense #";
-        let mut parser = Parser::new(line, 8);
-        let result = parser.parse();
-
-        // It's tested by eyes)
-        // There will be normal test for this in future.
-        dbg!(&result);
-
-        // panic!()
     }
 }

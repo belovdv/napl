@@ -6,6 +6,7 @@ pub enum SymbolType {
     EOS,
     /// ".".
     /// Separates `name chain`.
+    /// Also reserved for compiler and used for comments.
     Dot,
     /// ",".
     /// Separates parts of bracket substring.
@@ -13,10 +14,6 @@ pub enum SymbolType {
     /// "\"".
     /// Defines `string`.
     Quote,
-    /// "#".
-    /// Reserved for compiler.
-    /// Used for comments.
-    Inner,
     /// is_alphabetic or "_".
     /// Part of `name` or `literal`.
     Letter(char),
@@ -60,10 +57,9 @@ impl From<char> for SymbolType {
             '.' => Self::Dot,
             ',' => Self::Comma,
             '"' => Self::Quote,
-            '#' => Self::Inner, // To be done: replace this by dot.
             c if c.is_alphabetic() || c == '_' => Self::Letter(c),
             c if c.is_ascii_digit() => Self::Digit(c),
-            c if "<>+-*/=&|^!'".contains(c) => Self::Special(c),
+            c if "<>+-*/=&|^!'#".contains(c) => Self::Special(c),
             '(' => Self::Bracket(BracketType::Round, true),
             '[' => Self::Bracket(BracketType::Square, true),
             '{' => Self::Bracket(BracketType::Curly, true),

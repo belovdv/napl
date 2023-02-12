@@ -1,10 +1,10 @@
 class (some class)
       some property
       another
-  # simplest test
+  . simplest test
 
 fn func() -> (T)
-      # inner
+      . inner
       fn <-- is simple
   let a 3 (is a "hello world \t \n \\ \" ok? ")
   for i in std.range.range(4)

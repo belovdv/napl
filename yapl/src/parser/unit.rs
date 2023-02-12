@@ -62,7 +62,7 @@ pub fn chain(chars: &mut Stream) -> Result<Vec<Symbol>> {
                 s = String::new();
                 chars.next().unwrap();
             }
-            SymbolType::Inner | SymbolType::Quote => {
+            SymbolType::Quote => {
                 raise_error!(ExpectedWhitespace, chars.span(begin),)
             }
             SymbolType::Letter(_) | SymbolType::Digit(_) => s.push(chars.next().unwrap()),
@@ -82,7 +82,7 @@ pub fn special(chars: &mut Stream) -> Result<Symbol> {
     let mut result = String::new();
     loop {
         match SymbolType::from(chars.peek().map(|&c| c)) {
-            SymbolType::Inner | SymbolType::Quote => {
+            SymbolType::Quote => {
                 raise_error!(ExpectedWhitespace, chars.span(begin),)
             }
             SymbolType::Special(_) => result.push(chars.next().unwrap()),
@@ -100,7 +100,7 @@ pub fn int(chars: &mut Stream) -> Result<i64> {
     let mut result = String::new();
     loop {
         match SymbolType::from(chars.peek().map(|&c| c)) {
-            SymbolType::Inner | SymbolType::Quote => {
+            SymbolType::Quote => {
                 raise_error!(ExpectedWhitespace, chars.span(begin),)
             }
             SymbolType::Digit(_) => result.push(chars.next().unwrap()),

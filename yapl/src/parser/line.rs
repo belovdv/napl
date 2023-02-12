@@ -65,14 +65,14 @@ fn parse_statement(stream: &mut Stream) -> Result<Option<Expr>, Error> {
     match SymbolType::from(stream.peek().map(|&c| c)) {
         SymbolType::Whitespace(_) | SymbolType::NewLine => panic!(),
         SymbolType::EOS => Ok(None),
-        SymbolType::Dot | SymbolType::Comma => {
+        SymbolType::Dot => parse_inner(stream),
+        SymbolType::Comma => {
             raise_error!(UnsupportedSymbol, stream.span(begin),)
         }
         SymbolType::Quote => wrap_unit!(stream, begin, string, new_ls),
         SymbolType::Letter(_) => wrap_unit!(stream, begin, chain, new_c),
         SymbolType::Digit(_) => wrap_unit!(stream, begin, int, new_li),
         SymbolType::Special(_) => wrap_unit!(stream, begin, special, new_s),
-        SymbolType::Inner => parse_inner(stream),
         SymbolType::Bracket(t, true) => Ok(Some(parse_bracket(stream, t)?)),
         SymbolType::Bracket(_, false) => raise_error!(WrongBracket, stream.span(begin),),
         SymbolType::Other => raise_error!(UnsupportedSymbol, stream.span(begin),),

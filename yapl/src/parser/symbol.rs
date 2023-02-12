@@ -32,7 +32,7 @@ pub enum SymbolType {
     Special(char),
     /// " \t".
     /// Defines indent and separates tokens.
-    Whitespace(char),
+    Whitespace(u8),
     /// "\n".
     /// Separates lines.
     NewLine,
@@ -60,28 +60,28 @@ impl From<char> for SymbolType {
             '.' => Self::Dot,
             ',' => Self::Comma,
             '"' => Self::Quote,
-            '#' => Self::Inner,
+            '#' => Self::Inner, // To be done: replace this by dot.
             c if c.is_alphabetic() || c == '_' => Self::Letter(c),
             c if c.is_ascii_digit() => Self::Digit(c),
+            c if "<>+-*/=&|^!'".contains(c) => Self::Special(c),
             '(' => Self::Bracket(BracketType::Round, true),
             '[' => Self::Bracket(BracketType::Square, true),
             '{' => Self::Bracket(BracketType::Curly, true),
             ')' => Self::Bracket(BracketType::Round, false),
             ']' => Self::Bracket(BracketType::Square, false),
             '}' => Self::Bracket(BracketType::Curly, false),
-            c if "<>+-*/=&|^!'".contains(c) => Self::Special(c),
-            ' ' | '\t' => Self::Whitespace(c),
+            ' ' => Self::Whitespace(1),
+            '\t' => Self::Whitespace(TAB_TO_SPACES as u8),
             '\n' => Self::NewLine,
             _ => Self::Other,
         }
     }
 }
 
-pub const TAB_TO_SPACES: u8 = 2;
-pub fn offset(c: Option<char>) -> Option<u8> {
-    match c {
-        Some(' ') => Some(1),
-        Some('\t') => Some(TAB_TO_SPACES),
+const TAB_TO_SPACES: usize = 2;
+pub fn offset(offset_in_spaces: usize) -> Option<usize> {
+    match offset_in_spaces {
+        o if o % TAB_TO_SPACES == 0 => Some(o / TAB_TO_SPACES),
         _ => None,
     }
 }

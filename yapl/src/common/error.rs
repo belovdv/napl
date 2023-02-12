@@ -1,28 +1,16 @@
-pub trait Error: super::location::HasSpan {
+pub trait IsError: super::location::HasSpan + std::fmt::Debug {
     fn message(&self) -> String;
 }
 
-macro_rules! struct_error {
+pub type Error = Box<dyn IsError>;
+pub type Result<T> = core::result::Result<T, Error>;
+
+macro_rules! error_struct {
     ($name:ident, $message:literal, $($data:ident: $ty:ty),*) => {
-        #[derive(derive_new::new)]
+        #[derive(derive_new::new, Debug)]
         pub struct $name {
-            $($data: $ty),*,
             span: crate::common::location::Span,
-        }
-
-        impl $name {
-            pub fn raise_on<T>(object: &T, $($data: $ty),*) -> Self
-            where T: crate::common::location::HasSpan {
-                Self::new($($data),*,<T as crate::common::location::HasSpan>::span(&object))
-            }
-
-            pub fn raise_from_to(
-                begin: crate::common::location::Position,
-                end: crate::common::location::Position,
-                $($data: $ty),*
-            ) -> Self {
-                Self::new($($data),*, crate::common::location::Span::new(begin, end))
-            }
+            $($data: $ty),*
         }
 
         impl crate::common::location::HasSpan for $name {
@@ -30,13 +18,25 @@ macro_rules! struct_error {
                 self.span
             }
         }
-        impl crate::common::error::Error for $name {
+        impl crate::common::error::IsError for $name {
             fn message(&self) -> String {
                 format!($message, $(self.$data),*)
             }
         }
     };
 }
-pub(crate) use struct_error;
 
-pub type Result<T> = core::result::Result<T, Box<dyn Error>>;
+pub(crate) use error_struct;
+
+macro_rules! raise_error {
+    ($name:ident, $span:expr, $($data:ident),*) => {
+        return Err(Box::new($name::new($span, $($data),*)))
+    };
+}
+pub(crate) use raise_error;
+macro_rules! raise_error_on {
+    ($name:ident, $span:ident, $($data:ident),*) => {
+        return Err(Box::new($name::new($span.span(), $($data),*)))
+    };
+}
+pub(crate) use raise_error_on;

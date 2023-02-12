@@ -1,4 +1,7 @@
-# simplest test
+class (some class)
+      some property
+      another
+  # simplest test
 
 fn func() -> (T)
       # inner

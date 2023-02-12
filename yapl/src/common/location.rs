@@ -1,4 +1,5 @@
-use std::{fmt::Debug, path::PathBuf};
+use std::fmt::Debug;
+use std::path::{Path, PathBuf};
 
 #[derive(getset::Getters)]
 pub struct Context {
@@ -18,6 +19,17 @@ impl Context {
         }
         let lines: Vec<_> = code.lines().map(|s| s.to_string()).collect();
         Ok(Self { path, code, lines })
+    }
+
+    pub fn get_path(&self) -> &Path {
+        self.path.as_path()
+    }
+}
+
+impl HasSpan for Context {
+    // All file.
+    fn span(&self) -> Span {
+        Span::new(Default::default(), Position::new(self.code.len()).unwrap())
     }
 }
 
@@ -64,9 +76,11 @@ pub trait HasPosition {
 }
 
 // Note: don't forget, it has mean only in one `Context`.
-#[derive(Default, Clone, Copy, PartialEq)]
+#[derive(Default, Clone, Copy, PartialEq, getset::CopyGetters)]
 pub struct Span {
+    #[getset(get_copy = "pub")]
     begin: Position,
+    #[getset(get_copy = "pub")]
     end: Position,
 }
 
@@ -77,7 +91,8 @@ impl Span {
     }
 
     pub fn new_contained(first: Span, second: Span) -> Self {
-        assert!(first.end <= second.begin);
+        assert!(first.begin <= second.begin);
+        assert!(first.end <= second.end);
         Self {
             begin: first.begin,
             end: second.end,

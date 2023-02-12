@@ -3,35 +3,35 @@ use super::symbol::BracketType;
 use crate::common::location::{implement_has_span, Context, Span};
 use crate::common::symbol::Symbol;
 
-#[derive(derive_new::new)]
+#[derive(derive_new::new, getset::Getters)]
 pub struct File {
+    #[getset(get = "pub")]
     context: Context,
+    #[getset(get = "pub")]
     roots: Vec<Line>,
+    #[getset(get = "pub")]
     span: Span,
 }
 
-#[derive(Debug, PartialEq, derive_new::new)]
+#[derive(Debug, PartialEq, derive_new::new, getset::CopyGetters)]
 pub struct Line {
     sent: Sent,
     #[new(default)]
     extension: Vec<Line>,
     #[new(default)]
     block: Vec<Line>,
+    #[getset(get_copy = "pub")]
     span: Span, // Contains all sub lines.
 }
 
 impl Line {
-    pub fn set_extension(&mut self, extension: Vec<Line>) {
-        assert!(self.extension.is_empty());
-        assert!(self.block.is_empty());
+    pub fn update(&mut self, extension: Vec<Line>, block: Vec<Line>) {
         self.extension = extension;
-        // TODO: update span.
-    }
-
-    pub fn set_block(&mut self, block: Vec<Line>) {
-        assert!(self.block.is_empty());
         self.block = block;
-        // TODO: update span.
+        self.span = match (self.extension.last(), self.block.last()) {
+            (Some(last), None) | (_, Some(last)) => Span::new_contained(self.span, last.span),
+            (None, None) => self.span,
+        }
     }
 }
 

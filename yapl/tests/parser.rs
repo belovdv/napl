@@ -2,18 +2,15 @@ use std::path::PathBuf;
 
 use yapl::{parse, Context};
 
-// Disable for this commit - it will be redone in the next.
-// #[test]
+#[test]
 fn basics() {
-    /*
     let path: PathBuf = "tests/auxiliary/test_basics.yapl".into();
     let context = Context::new_read(path.clone()).unwrap();
 
-    dbg!(&context.file);
-    dbg!(&context.lines);
+    dbg!(&context.code().lines().collect::<Vec<_>>());
 
-    let parsed = parse(&context);
-    let result = format!("{:#?}", &parsed);
+    let parsed = parse(context).unwrap();
+    let result = format!("{:#?}", &parsed.roots());
 
     let out = path.parent().unwrap().join("test_basics.out");
     // To be done: fix spans.
@@ -22,5 +19,4 @@ fn basics() {
     let expected = std::fs::read_to_string(out).unwrap();
 
     assert!(result == expected);
-    */
 }

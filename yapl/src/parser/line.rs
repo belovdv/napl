@@ -1,167 +1,154 @@
 use super::ast::{Expr, Line, Sent};
-use super::errors::ErrorSimple;
+use super::errors::{
+    ClosingBracket, EmptyBracketPart, UnsupportedSymbol, WrongBracket, WrongLineOffset,
+};
 use super::stream::Stream;
-use super::symbol::{self, BracketType, SymbolType, TAB_TO_SPACES};
+use super::symbol::{self, BracketType, SymbolType};
 use super::unit;
 
-use crate::common::error::Result;
-use crate::common::location::{Position, Span};
+use crate::common::error::{raise_error, Error};
 
-pub struct Parser<'a> {
-    chars: Stream<'a>,
-    pos: Position,
+pub fn parse(line: &str) -> Result<Vec<(usize, Line)>, Vec<Error>> {
+    let mut result = Vec::new();
+    let mut errors = Vec::new();
+    let mut pos = 0;
+    for line in line.lines() {
+        match parse_line(&mut Stream::new(line.chars().peekable(), pos)) {
+            Ok(Some(r)) => result.push(r),
+            Ok(None) => {}
+            Err(e) => errors.push(e),
+        }
+        pos += line.len() + 1;
+    }
+
+    if errors.len() != 0 {
+        return Err(errors);
+    }
+    Ok(result)
+}
+
+pub fn parse_line(stream: &mut Stream) -> Result<Option<(usize, Line)>, Error> {
+    let begin = stream.pos();
+    let offset = match parse_whitespace(stream) {
+        Some(o) => match symbol::offset(o) {
+            Some(offset) => offset,
+            None => raise_error!(WrongLineOffset, stream.span(begin), o),
+        },
+        None => return Ok(None),
+    };
+
+    let mut sent = Vec::new();
+    while let Some(_) = stream.peek() {
+        let Some(next) = parse_statement(stream)? else {
+                break;
+            };
+        sent.push(next);
+    }
+
+    match Sent::new(sent) {
+        Some(s) => Ok(Some((offset, Line::new(s, stream.span(begin))))),
+        None => Ok(None),
+    }
 }
 
 macro_rules! wrap_unit {
-    ($uf:ident, $s:ident, $stt:ident) => {
-        unit::$uf(&mut $s.chars).map(|d| Expr::$stt(d, Default::default()))
+    ($stream:ident, $begin:ident, $uf:ident, $stt:ident) => {
+        Ok(Some(
+            unit::$uf($stream).map(|d| Expr::$stt(d, $stream.span($begin)))?,
+        ))
     };
 }
 
-impl<'a> Parser<'a> {
-    pub fn new(line: &'a str, position: usize) -> Self {
-        Self {
-            chars: Stream::<'a>::from(line),
-            pos: Position::new(position).unwrap(),
+fn parse_statement(stream: &mut Stream) -> Result<Option<Expr>, Error> {
+    parse_whitespace(stream);
+    let begin = stream.pos();
+    match SymbolType::from(stream.peek().map(|&c| c)) {
+        SymbolType::Whitespace(_) | SymbolType::NewLine => panic!(),
+        SymbolType::EOS => Ok(None),
+        SymbolType::Dot | SymbolType::Comma => {
+            raise_error!(UnsupportedSymbol, stream.span(begin),)
+        }
+        SymbolType::Quote => wrap_unit!(stream, begin, string, new_ls),
+        SymbolType::Letter(_) => wrap_unit!(stream, begin, chain, new_c),
+        SymbolType::Digit(_) => wrap_unit!(stream, begin, int, new_li),
+        SymbolType::Special(_) => wrap_unit!(stream, begin, special, new_s),
+        SymbolType::Inner => parse_inner(stream),
+        SymbolType::Bracket(t, true) => Ok(Some(parse_bracket(stream, t)?)),
+        SymbolType::Bracket(_, false) => raise_error!(WrongBracket, stream.span(begin),),
+        SymbolType::Other => raise_error!(UnsupportedSymbol, stream.span(begin),),
+    }
+}
+
+// Returns `None` if found `NewLine`.
+// Returns logical offset.
+fn parse_whitespace(stream: &mut Stream) -> Option<usize> {
+    let mut offset = 0;
+    loop {
+        match SymbolType::from(stream.peek().map(|&c| c)) {
+            SymbolType::Whitespace(of) => {
+                offset += of as usize;
+                stream.next().unwrap();
+            }
+            SymbolType::NewLine | SymbolType::EOS => return None,
+            _ => return Some(offset),
         }
     }
+}
 
-    pub fn parse(&mut self) -> Result<Option<(u8, Line)>> {
-        let offset_s = self.parse_whitespace();
-        let pos = self.chars.pos();
-        let offset = offset_s / TAB_TO_SPACES;
-        if offset * TAB_TO_SPACES != offset_s {
-            return Err(Box::new(ErrorSimple::new(
-                "offset is not divisible by 4".to_string(),
-                Default::default(),
-            )));
+fn parse_inner(stream: &mut Stream) -> Result<Option<Expr>, Error> {
+    let begin = stream.pos();
+    stream.next().unwrap();
+    match stream.peek() {
+        // It is comment.
+        Some(' ') => {
+            while matches!(stream.peek(), Some(c) if *c != '\n') {
+                stream.next().unwrap();
+            }
+            Ok(None)
         }
+        _ => raise_error!(UnsupportedSymbol, stream.span(begin),),
+    }
+}
 
-        let mut statements = Vec::new();
-        while let Some(&c) = self.chars.peek() {
-            let (next, _) = self.parse_statement(c)?;
-            statements.push(next)
+fn parse_bracket(stream: &mut Stream, t: BracketType) -> Result<Expr, Error> {
+    // To be done: rewrite.
+    let begin = stream.pos();
+    stream.next().unwrap();
+    parse_whitespace(stream);
+    match SymbolType::from(stream.peek().map(|&c| c)) {
+        SymbolType::Bracket(tt, false) if tt == t => {
+            stream.next().unwrap();
+            return Ok(Expr::new_b(t, Vec::new(), stream.span(begin)));
         }
-
-        if statements.len() == 0 {
-            return Ok(None);
-        }
-        Ok(Some((
-            offset,
-            Line::new(Sent::new(statements).unwrap(), Default::default()),
-        )))
+        _ => {}
     }
 
-    fn parse_statement(&mut self, peek: char) -> Result<(Expr, Span)> {
-        /*
-        let statement = match SymbolType::from(peek) {
-            SymbolType::NewLine | SymbolType::EOS => panic!("{:?}", peek),
-            SymbolType::Dot | SymbolType::Comma | SymbolType::Other => {
-                Err(format!("unexpected symbol {}", peek))
-            }
-            SymbolType::Whitespace(_) => {
-                self.parse_whitespace();
-                Ok(Default::default())
-            }
-            SymbolType::Quote => wrap_unit!(string, self, LitString),
-            SymbolType::Letter(_) => wrap_unit!(chain, self, Chain),
-            SymbolType::Digit(_) => wrap_unit!(int, self, LitInt),
-            SymbolType::Special(_) => wrap_unit!(special, self, Special),
-            SymbolType::Inner => self.parse_inner(),
-            SymbolType::Bracket(bt, true) => Ok(self.parse_bracket(bt)?),
-            SymbolType::Bracket(_, false) => Err("unexpected closing bracket".to_string()),
+    let mut sentences = Vec::new();
+    let mut sent = Vec::new();
+    while let Some(_) = stream.peek() {
+        let Some(next) = parse_statement(stream)? else {
+            break;
         };
-        let size = self.chars.taken() as u8;
-        let span = Span::new_p(self.pos, size);
-        self.pos.mov(size);
-        match statement {
-            Ok(st) => Ok((st, span)),
-            Err(e) => Err(Error::new(e, span)),
-        }
-        */
-        todo!()
-    }
-
-    fn parse_whitespace(&mut self) -> u8 {
-        let mut offset = 0;
-        loop {
-            match SymbolType::from(self.chars.peek().map(|&c| c)) {
-                SymbolType::Whitespace(_) => offset += symbol::offset(self.chars.next()).unwrap(),
-                SymbolType::NewLine => panic!(),
-                _ => return offset,
-            }
-        }
-    }
-
-    fn parse_inner(&mut self) -> core::result::Result<Expr, String> {
-        /*
-        self.chars.next().unwrap();
-        match self.chars.next() {
-            Some(' ') => {
-                // Skip comment.
-                while let Some(_) = self.chars.next() {}
-                Ok(Expr::None)
-            }
-            Some(_) => Err(format!("expected comment")),
-            None => Err(format!("`inner` on the end of the line")),
-        }
-        */
-        todo!()
-    }
-
-    fn parse_bracket(&mut self, t: BracketType) -> Result<Expr> {
-        /*
-        self.chars.next().unwrap();
-        let mut parts = Vec::new();
-        let mut sent = Vec::new();
-        let mut sent_pos = self.pos;
-        loop {
-            let next = self.chars.peek().map(|&c| c);
-            match SymbolType::from(next) {
-                SymbolType::Bracket(ct, false) => {
-                    if t == ct {
-                        self.chars.next().unwrap();
-                        if sent.len() != 0 {
-                            parts.push(Sentence {
-                                statements: sent,
-                                span: Span::new_p(sent_pos, self.pos.offset - sent_pos.offset),
-                            });
-                        }
-                        return Ok(Statement::Bracket((t, parts)));
-                    } else {
-                        return Err(Error::new(
-                            "wrong closing bracket".to_string(),
-                            Span::new_p(sent_pos, self.pos.offset - sent_pos.offset),
-                        ));
-                    }
+        sent.push(next);
+        parse_whitespace(stream);
+        match SymbolType::from(stream.peek().map(|&c| c)) {
+            SymbolType::Comma => {
+                match Sent::new(sent) {
+                    Some(s) => sentences.push(s),
+                    None => raise_error!(EmptyBracketPart, stream.span(begin),),
                 }
-                SymbolType::Comma => {
-                    self.chars.next().unwrap();
-                    if sent.len() == 0 {
-                        return Err(Error::new(
-                            "empty last part".to_string(),
-                            Span::new_p(sent_pos, self.pos.offset - sent_pos.offset),
-                        ));
-                    }
-                    parts.push(Sentence {
-                        statements: sent,
-                        span: Span::new_p(
-                            sent_pos,
-                            self.pos.offset - sent_pos.offset - sent_pos.offset,
-                        ),
-                    });
-                    sent_pos = self.pos;
-                    sent = Vec::new();
-                }
-                _ => {
-                    let next = self.parse_statement(next.unwrap())?;
-                    if !matches!(next.0, Statement::None) {
-                        sent.push(next)
-                    }
-                }
+                sent = Vec::new()
             }
+            SymbolType::Bracket(tt, false) if tt == t => {
+                stream.next().unwrap();
+                match Sent::new(sent) {
+                    Some(s) => sentences.push(s),
+                    None => raise_error!(EmptyBracketPart, stream.span(begin),),
+                }
+                return Ok(Expr::new_b(t, sentences, stream.span(begin)));
+            }
+            _ => {}
         }
-        */
-        todo!()
     }
+    raise_error!(ClosingBracket, stream.span(begin),)
 }

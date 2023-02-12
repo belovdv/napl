@@ -3,33 +3,19 @@ mod ast;
 mod errors;
 mod stream;
 mod symbol;
-// Parse unit statements.
-mod unit;
-// Parse single line.
+// Parsing.
 mod line;
-// Build file tree from line offsets.
 mod tree;
+mod unit;
 
 use crate::common::error::Error;
-use crate::common::location::Context;
+use crate::common::location::{Context, HasSpan};
 
-pub fn parse(file: Context) -> Result<ast::File, Vec<Box<dyn Error>>> {
-    let mut lines = Vec::new();
-    let mut errors = Vec::new();
-    file.code()
-        .lines()
-        .enumerate()
-        .map(|(n, l)| line::Parser::new(l, n).parse())
-        .for_each(|r| match r {
-            Ok(v) => lines.push(v),
-            Err(e) => errors.push(e),
-        });
-    if !errors.is_empty() {
-        return Err(errors);
-    }
-
-    match tree::parse_line_hierarchy(&mut lines.into_iter().flatten().peekable(), 0) {
-        Ok(v) => Ok(ast::File::new(file, v, Default::default())),
+pub fn parse(file: Context) -> Result<ast::File, Vec<Error>> {
+    let lines = line::parse(file.code())?;
+    let file_span = file.span();
+    match tree::parse_line_hierarchy(&mut lines.into_iter().peekable(), 0) {
+        Ok(v) => Ok(ast::File::new(file, v, file_span)),
         Err(e) => Err(vec![e]),
     }
 }

@@ -7,6 +7,8 @@ publish = false
 [dependencies]
 derive-new = "0.5"
 getset = "0.1.2"
+serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0.93"
 
 [lib]
 name = "yapl"

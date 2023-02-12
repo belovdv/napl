@@ -3,6 +3,8 @@ use super::symbol::BracketType;
 use crate::common::location::{implement_has_span, Context, Span};
 use crate::common::symbol::Symbol;
 
+use serde::{Deserialize, Serialize};
+
 #[derive(derive_new::new, getset::Getters)]
 pub struct File {
     #[getset(get = "pub")]
@@ -13,7 +15,7 @@ pub struct File {
     span: Span,
 }
 
-#[derive(Debug, PartialEq, derive_new::new, getset::CopyGetters)]
+#[derive(Debug, PartialEq, derive_new::new, getset::CopyGetters, Serialize, Deserialize)]
 pub struct Line {
     sent: Sent,
     #[new(default)]
@@ -35,7 +37,7 @@ impl Line {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Sent {
     sent: Vec<Expr>,
     span: Span,
@@ -51,7 +53,7 @@ impl Sent {
     }
 }
 
-#[derive(Debug, PartialEq, derive_new::new)]
+#[derive(Debug, PartialEq, derive_new::new, Serialize, Deserialize)]
 pub struct Expr {
     expr: ExprT,
     span: Span,
@@ -73,7 +75,7 @@ expr_new!(new_b, Bracket, ty: BracketType, parts: Vec<Sent>);
 expr_new!(new_ls, LitS, val: String);
 expr_new!(new_li, LitI, val: i64);
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub enum ExprT {
     Inner(Box<Expr>),
     Special(Symbol),

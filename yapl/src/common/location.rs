@@ -1,6 +1,8 @@
 use std::fmt::Debug;
 use std::path::{Path, PathBuf};
 
+use serde::{Deserialize, Serialize};
+
 #[derive(getset::Getters)]
 pub struct Context {
     path: PathBuf,
@@ -34,7 +36,7 @@ impl HasSpan for Context {
 }
 
 // Note: don't forget, it has mean only in one `Context`.
-#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub struct Position {
     pos: u16,
 }
@@ -76,7 +78,7 @@ pub trait HasPosition {
 }
 
 // Note: don't forget, it has mean only in one `Context`.
-#[derive(Default, Clone, Copy, PartialEq, getset::CopyGetters)]
+#[derive(Default, Clone, Copy, PartialEq, getset::CopyGetters, Serialize, Deserialize)]
 pub struct Span {
     #[getset(get_copy = "pub")]
     begin: Position,

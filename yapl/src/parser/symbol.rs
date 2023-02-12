@@ -1,6 +1,6 @@
 /// Basic grammatical rules.
 /// This is, if it will be possible, will be simplified.
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy, serde::Serialize, serde::Deserialize)]
 pub enum SymbolType {
     /// End of stream.
     EOS,
@@ -38,7 +38,7 @@ pub enum SymbolType {
     Other,
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
 pub enum BracketType {
     Round,
     Square,

@@ -18,5 +18,10 @@ fn basics() {
     // This contains more or less all patterns, so remove unit tests.
     let expected = std::fs::read_to_string(out).unwrap();
 
+    // `Debug` output is more convenient to read.
+    // let json_file = path.parent().unwrap().join("test_basics.json");
+    // let json_str = serde_json::to_string(parsed.roots()).unwrap();
+    // std::fs::write(json_file, json_str).unwrap();
+
     assert!(result == expected);
 }

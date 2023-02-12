@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct Symbol(String); // To be done: pool for strings with u32 keys.
 
 impl From<String> for Symbol {

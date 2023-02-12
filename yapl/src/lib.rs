@@ -6,4 +6,4 @@ mod common;
 
 pub use parser::parse;
 
-pub use common::file::Context;
+pub use common::location::Context;

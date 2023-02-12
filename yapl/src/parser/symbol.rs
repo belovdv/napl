@@ -77,7 +77,7 @@ impl From<char> for SymbolType {
     }
 }
 
-pub const TAB_TO_SPACES: u8 = 4;
+pub const TAB_TO_SPACES: u8 = 2;
 pub fn offset(c: Option<char>) -> Option<u8> {
     match c {
         Some(' ') => Some(1),

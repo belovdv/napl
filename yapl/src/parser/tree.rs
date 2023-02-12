@@ -1,10 +1,11 @@
 use std::iter::Peekable;
 
-use crate::common::file::{Error, Span};
+use crate::common::error::Result;
 
 use super::ast::Line;
+use super::errors::ErrorSimple;
 
-pub fn parse_line_hierarchy<I>(lines: &mut Peekable<I>, offset: u8) -> Result<Vec<Line>, Error>
+pub fn parse_line_hierarchy<I>(lines: &mut Peekable<I>, offset: u8) -> Result<Vec<Line>>
 where
     I: Iterator<Item = (u8, Line)>,
 {
@@ -14,8 +15,8 @@ where
             (of, _) if *of < offset => break,
             (of, _) if *of == offset => {
                 let (_, mut line) = lines.next().unwrap();
-                line.extension = parse_line_hierarchy(lines, offset + 2)?;
-                line.content = parse_line_hierarchy(lines, offset + 1)?;
+                line.set_extension(parse_line_hierarchy(lines, offset + 3)?);
+                line.set_block(parse_line_hierarchy(lines, offset + 1)?);
                 result.push(line)
             }
             (_, l) => return Err(err("wrong offset".to_string(), l)),
@@ -24,7 +25,7 @@ where
     Ok(result)
 }
 
-fn err(message: String, line: &Line) -> Error {
-    let len = line.sentence.statements.last().map(|(_, s)| s.end.offset);
-    Error::new(message, Span::new_s(line.num, 0, len.unwrap_or(0)))
+fn err(message: String, line: &Line) -> Box<ErrorSimple> {
+    // let len = line.sentence.statements.last().map(|(_, s)| s.end.offset);
+    Box::new(ErrorSimple::new(message, Default::default()))
 }

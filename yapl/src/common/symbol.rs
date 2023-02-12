@@ -17,6 +17,6 @@ impl From<&'static str> for Symbol {
 
 impl Debug for Symbol {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_fmt(format_args!("Symbol \"{}\"", self.0))
+        f.write_fmt(format_args!("Symbol(\"{}\")", self.0))
     }
 }

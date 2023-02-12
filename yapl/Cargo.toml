@@ -5,6 +5,8 @@ edition = "2021"
 publish = false
 
 [dependencies]
+derive-new = "0.5"
+getset = "0.1.2"
 
 [lib]
 name = "yapl"

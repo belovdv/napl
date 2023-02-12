@@ -1,9 +1,11 @@
-use super::ast::{Line, Sentence, Statement};
+use super::ast::{Expr, Line, Sent};
+use super::errors::ErrorSimple;
 use super::stream::Stream;
-use super::symbol::{self, BracketType, SymbolType};
+use super::symbol::{self, BracketType, SymbolType, TAB_TO_SPACES};
 use super::unit;
 
-use crate::common::file::{Error, Position, Span};
+use crate::common::error::Result;
+use crate::common::location::{Position, Span};
 
 pub struct Parser<'a> {
     chars: Stream<'a>,
@@ -12,46 +14,46 @@ pub struct Parser<'a> {
 
 macro_rules! wrap_unit {
     ($uf:ident, $s:ident, $stt:ident) => {
-        unit::$uf(&mut $s.chars).map(|d| Statement::$stt(d))
+        unit::$uf(&mut $s.chars).map(|d| Expr::$stt(d, Default::default()))
     };
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(line: &'a str, line_num: u16) -> Self {
+    pub fn new(line: &'a str, position: usize) -> Self {
         Self {
-            chars: Stream::<'a>::new(line),
-            pos: Position::new(line_num, 0),
+            chars: Stream::<'a>::from(line),
+            pos: Position::new(position).unwrap(),
         }
     }
 
-    pub fn parse(&mut self) -> Result<Option<(u8, Line)>, Error> {
+    pub fn parse(&mut self) -> Result<Option<(u8, Line)>> {
         let offset_s = self.parse_whitespace();
-        let shift = self.chars.taken() as u8;
-        let offset = offset_s / 4;
-        if offset * 4 != offset_s {
-            return Err(Error::new(
+        let pos = self.chars.pos();
+        let offset = offset_s / TAB_TO_SPACES;
+        if offset * TAB_TO_SPACES != offset_s {
+            return Err(Box::new(ErrorSimple::new(
                 "offset is not divisible by 4".to_string(),
-                Span::new_p(self.pos, shift),
-            ));
+                Default::default(),
+            )));
         }
-        self.pos.mov(shift);
 
         let mut statements = Vec::new();
         while let Some(&c) = self.chars.peek() {
-            let next = self.parse_statement(c)?;
-            if !matches!(next.0, Statement::None) {
-                statements.push(next)
-            }
+            let (next, _) = self.parse_statement(c)?;
+            statements.push(next)
         }
 
         if statements.len() == 0 {
             return Ok(None);
         }
-        let span = Span::new(statements[0].1.begin, statements.last().unwrap().1.end);
-        Ok(Some((offset, Line::new(Sentence { statements, span }))))
+        Ok(Some((
+            offset,
+            Line::new(Sent::new(statements).unwrap(), Default::default()),
+        )))
     }
 
-    fn parse_statement(&mut self, peek: char) -> Result<(Statement, Span), Error> {
+    fn parse_statement(&mut self, peek: char) -> Result<(Expr, Span)> {
+        /*
         let statement = match SymbolType::from(peek) {
             SymbolType::NewLine | SymbolType::EOS => panic!("{:?}", peek),
             SymbolType::Dot | SymbolType::Comma | SymbolType::Other => {
@@ -76,6 +78,8 @@ impl<'a> Parser<'a> {
             Ok(st) => Ok((st, span)),
             Err(e) => Err(Error::new(e, span)),
         }
+        */
+        todo!()
     }
 
     fn parse_whitespace(&mut self) -> u8 {
@@ -89,20 +93,24 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn parse_inner(&mut self) -> Result<Statement, String> {
+    fn parse_inner(&mut self) -> core::result::Result<Expr, String> {
+        /*
         self.chars.next().unwrap();
         match self.chars.next() {
             Some(' ') => {
                 // Skip comment.
                 while let Some(_) = self.chars.next() {}
-                Ok(Statement::None)
+                Ok(Expr::None)
             }
             Some(_) => Err(format!("expected comment")),
             None => Err(format!("`inner` on the end of the line")),
         }
+        */
+        todo!()
     }
 
-    fn parse_bracket(&mut self, t: BracketType) -> Result<Statement, Error> {
+    fn parse_bracket(&mut self, t: BracketType) -> Result<Expr> {
+        /*
         self.chars.next().unwrap();
         let mut parts = Vec::new();
         let mut sent = Vec::new();
@@ -153,5 +161,7 @@ impl<'a> Parser<'a> {
                 }
             }
         }
+        */
+        todo!()
     }
 }

@@ -29,13 +29,13 @@ pub enum SymbolType {
     Special(char),
     /// " \t".
     /// Defines indent and separates tokens.
-    Whitespace(u8),
+    Whitespace(usize),
     /// "\n".
     /// Separates lines.
     NewLine,
     /// Any other unicode.
     /// Forbidden to be used (except `string`).
-    Other,
+    Other(char),
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
@@ -67,9 +67,9 @@ impl From<char> for SymbolType {
             ']' => Self::Bracket(BracketType::Square, false),
             '}' => Self::Bracket(BracketType::Curly, false),
             ' ' => Self::Whitespace(1),
-            '\t' => Self::Whitespace(TAB_TO_SPACES as u8),
+            '\t' => Self::Whitespace(TAB_TO_SPACES),
             '\n' => Self::NewLine,
-            _ => Self::Other,
+            c => Self::Other(c),
         }
     }
 }

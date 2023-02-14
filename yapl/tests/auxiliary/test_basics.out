@@ -67,7 +67,7 @@
                 },
                 extension: [],
                 block: [],
-                span: Span(19, 38),
+                span: Span(25, 38),
             },
             Line {
                 sent: Sent {
@@ -85,7 +85,7 @@
                 },
                 extension: [],
                 block: [],
-                span: Span(39, 52),
+                span: Span(45, 52),
             },
         ],
         block: [],
@@ -186,7 +186,7 @@
                 },
                 extension: [],
                 block: [],
-                span: Span(103, 125),
+                span: Span(109, 125),
             },
         ],
         block: [
@@ -210,7 +210,7 @@
                             span: Span(132, 133),
                         },
                         Expr {
-                            expr: LitI(
+                            expr: LitInt(
                                 3,
                             ),
                             span: Span(134, 135),
@@ -238,7 +238,7 @@
                                                 span: Span(140, 141),
                                             },
                                             Expr {
-                                                expr: LitS(
+                                                expr: LitStr(
                                                     "hello world \t \n \\ \" ok? ",
                                                 ),
                                                 span: Span(142, 172),
@@ -255,7 +255,7 @@
                 },
                 extension: [],
                 block: [],
-                span: Span(126, 173),
+                span: Span(128, 173),
             },
             Line {
                 sent: Sent {
@@ -301,7 +301,7 @@
                                     Sent {
                                         sent: [
                                             Expr {
-                                                expr: LitI(
+                                                expr: LitInt(
                                                     4,
                                                 ),
                                                 span: Span(201, 202),
@@ -381,7 +381,7 @@
                                 },
                                 extension: [],
                                 block: [],
-                                span: Span(221, 249),
+                                span: Span(231, 249),
                             },
                         ],
                         block: [
@@ -417,7 +417,7 @@
                                                                         Sent {
                                                                             sent: [
                                                                                 Expr {
-                                                                                    expr: LitI(
+                                                                                    expr: LitInt(
                                                                                         1,
                                                                                     ),
                                                                                     span: Span(271, 272),
@@ -429,7 +429,7 @@
                                                                                     span: Span(273, 274),
                                                                                 },
                                                                                 Expr {
-                                                                                    expr: LitI(
+                                                                                    expr: LitInt(
                                                                                         2345,
                                                                                     ),
                                                                                     span: Span(275, 279),
@@ -453,7 +453,7 @@
                                 },
                                 extension: [],
                                 block: [],
-                                span: Span(250, 281),
+                                span: Span(256, 281),
                             },
                             Line {
                                 sent: Sent {
@@ -475,7 +475,7 @@
                                             span: Span(295, 300),
                                         },
                                         Expr {
-                                            expr: LitI(
+                                            expr: LitInt(
                                                 2,
                                             ),
                                             span: Span(301, 302),
@@ -485,13 +485,13 @@
                                 },
                                 extension: [],
                                 block: [],
-                                span: Span(282, 302),
+                                span: Span(288, 302),
                             },
                         ],
-                        span: Span(204, 302),
+                        span: Span(208, 302),
                     },
                 ],
-                span: Span(174, 302),
+                span: Span(176, 302),
             },
             Line {
                 sent: Sent {
@@ -509,7 +509,7 @@
                 },
                 extension: [],
                 block: [],
-                span: Span(303, 311),
+                span: Span(305, 311),
             },
         ],
         span: Span(72, 311),

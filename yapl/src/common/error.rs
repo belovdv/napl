@@ -28,8 +28,9 @@ macro_rules! error_struct {
 
 pub(crate) use error_struct;
 
+// To be done: get rid of trailing comma in case with no `data`.
 macro_rules! raise_error {
-    ($name:ident, $span:expr, $($data:ident),*) => {
+    ($name:ident, $span:expr, $($data:expr),*) => {
         return Err(Box::new($name::new($span, $($data),*)))
     };
 }

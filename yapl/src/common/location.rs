@@ -1,4 +1,5 @@
 use std::fmt::Debug;
+use std::ops::Add;
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
@@ -92,15 +93,6 @@ impl Span {
         Self { begin, end }
     }
 
-    pub fn new_contained(first: Span, second: Span) -> Self {
-        assert!(first.begin <= second.begin);
-        assert!(first.end <= second.end);
-        Self {
-            begin: first.begin,
-            end: second.end,
-        }
-    }
-
     pub fn contains(&self, inner: Span) -> bool {
         self.begin <= inner.begin && self.end >= inner.end
     }
@@ -109,6 +101,19 @@ impl Span {
 impl Debug for Span {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_fmt(format_args!("Span({}, {})", self.begin.pos, self.end.pos))
+    }
+}
+
+impl Add for Span {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        assert!(self.begin <= rhs.begin);
+        assert!(self.end <= rhs.end);
+        Self {
+            begin: self.begin,
+            end: rhs.end,
+        }
     }
 }
 

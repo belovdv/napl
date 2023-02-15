@@ -1,9 +1,17 @@
-// pub should be removed
-pub mod ast;
-pub mod parser;
-
 mod common;
 
+mod ast;
+mod parser;
+
+mod glue;
+
+/// `location::Context as File` -> Result<parser::Ast>.
 pub use parser::parse;
 
-pub use common::location::Context;
+/// parser::Ast -> ast::Ast.
+pub use glue::parser2ast::parser2ast;
+
+pub use common::error::Result;
+pub use common::location::File;
+
+pub use ast::Project;

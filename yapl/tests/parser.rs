@@ -1,11 +1,11 @@
 use std::path::PathBuf;
 
-use yapl::{parse, Context};
+use yapl::{parse, File};
 
 #[test]
 fn basics() {
     let path: PathBuf = "tests/auxiliary/test_basics.yapl".into();
-    let context = Context::new_read(path.clone()).unwrap();
+    let context = File::new_read(path.clone()).unwrap();
 
     let out = path.parent().unwrap().join("test_basics.out");
     let parsed = match parse(&context) {

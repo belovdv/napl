@@ -35,9 +35,3 @@ macro_rules! raise_error {
     };
 }
 pub(crate) use raise_error;
-macro_rules! raise_error_on {
-    ($name:ident, $span:ident, $($data:ident),*) => {
-        return Err(Box::new($name::new($span.span(), $($data),*)))
-    };
-}
-pub(crate) use raise_error_on;

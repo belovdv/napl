@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 use serde::{Deserialize, Serialize};
 
 #[derive(getset::Getters)]
-pub struct Context {
+pub struct File {
     path: PathBuf,
     #[getset(get = "pub")]
     code: String,
@@ -14,7 +14,7 @@ pub struct Context {
 
 const MAX_FILE_SIZE: usize = 60000;
 
-impl Context {
+impl File {
     pub fn new_read(path: PathBuf) -> Result<Self, String> {
         let code = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
         if code.len() > MAX_FILE_SIZE {
@@ -29,7 +29,7 @@ impl Context {
     }
 }
 
-impl HasSpan for Context {
+impl HasSpan for File {
     // All file.
     fn span(&self) -> Span {
         Span::new(Default::default(), Position::new(self.code.len()).unwrap())
@@ -61,7 +61,7 @@ impl Position {
 
     // To be done: sublinear algorithm.
     // Note: don't forget, it has mean only in one `Context`.
-    pub fn get_line_and_offset(&self, context: &Context) -> Option<(usize, usize)> {
+    pub fn get_line_and_offset(&self, context: &File) -> Option<(usize, usize)> {
         let mut pos = self.pos as usize;
         for (line_number, line) in context.lines.iter().enumerate() {
             if pos >= line.len() {

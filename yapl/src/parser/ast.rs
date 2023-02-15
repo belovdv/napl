@@ -1,6 +1,6 @@
 use super::symbol::BracketType;
 
-use crate::common::location::{implement_has_span, Context, Span};
+use crate::common::location::{self, implement_has_span, Span};
 use crate::common::symbol::Symbol;
 
 use serde::{Deserialize, Serialize};
@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 #[derive(derive_new::new, getset::Getters)]
 pub struct File<'file> {
     #[getset(get = "pub")]
-    context: &'file Context,
+    context: &'file location::File,
     #[getset(get = "pub")]
     roots: Vec<Line>,
     #[getset(get = "pub")]

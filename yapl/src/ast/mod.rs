@@ -1,7 +1,6 @@
-// TODO: remove pub.
+// TODO: remove `pub`.
+// TODO: remove `allow`.
 pub mod ast;
 pub mod context;
-pub mod object;
 
-pub use object::Object;
 pub use ast::Project;

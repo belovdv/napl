@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-#[derive(Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub struct Id {
     // To be done: 'space.
     id: u32,
@@ -8,11 +8,11 @@ pub struct Id {
     // _ty: PhantomData<T>,
 }
 
-pub struct Space<T: std::cmp::PartialEq> {
+pub struct Space<T> {
     data: Vec<T>,
 }
 
-impl<T: std::cmp::PartialEq> Space<T> {
+impl<T> Space<T> {
     pub fn get(&self, id: Id) -> &T {
         &self.data[id.id as usize]
     }
@@ -22,13 +22,19 @@ impl<T: std::cmp::PartialEq> Space<T> {
 
     // To be done: erase doesn't exist.
     pub fn insert(&mut self, t: T) -> Id {
+        let id = self.data.len() as u32;
+        self.data.push(t);
+        Id { id }
+    }
+}
+
+impl<T: std::cmp::PartialEq> Space<T> {
+    pub fn insert_unique(&mut self, t: T) -> Id {
         let old = self.data.iter().position(|v| *v == t);
         if let Some(pos) = old {
             return Id { id: pos as u32 };
         }
-        let id = self.data.len() as u32;
-        self.data.push(t);
-        Id { id }
+        self.insert(t)
     }
 }
 
@@ -52,11 +58,21 @@ impl Debug for Id {
     }
 }
 
-// impl<T> Clone for Id {
-//     fn clone(&self) -> Self {
-//         Self {
-//             id: self.id.clone(),
-//             _ty: self._ty.clone(),
-//         }
-//     }
-// }
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test() {
+        let mut space: Space<String> = Default::default();
+
+        let abc = space.insert("abc".to_string());
+        let bcd = space.insert("bcd".to_string());
+        let cda = space.insert("cda".to_string());
+        let bcd_c = bcd;
+
+        assert_eq!(space.get(abc), "abc");
+        assert_eq!(space.get(bcd), space.get(bcd_c));
+        assert_eq!(space.get(cda), "cda");
+    }
+}

@@ -1,12 +1,12 @@
 use crate::common::error::Result;
 use crate::common::location::Span;
 use crate::common::symbol::Symbol;
+use crate::common::Id as Obj;
 
 use super::context::ContextPart;
-use super::object::Object;
 
-pub type Id = crate::common::space::Id;
-pub type Space = crate::common::space::Space<Value>;
+// pub type Id = crate::common::space::Id;
+// pub type Space = crate::common::space::Space<Value>;
 
 pub struct Project {
     // space: Space,
@@ -25,7 +25,7 @@ pub struct Line {
 }
 
 pub enum Value {
-    Object(Object),
+    Object(Obj),
     Action(Action),
 }
 
@@ -75,7 +75,7 @@ impl Project {
         Self { /* space,*/ roots, }
     }
 
-    pub fn interpret(self) -> Result<Vec<Object>> {
+    pub fn interpret(self) -> Result<Vec<Obj>> {
         let mut context = Default::default();
         // let mut space = self.space;
         let roots: Result<Vec<_>> = self
@@ -91,8 +91,8 @@ impl Line {
     fn act(
         self,
         /* space: &mut Space, */
-        context: &mut ContextPart<Object>,
-    ) -> Result<Option<Object>> {
+        context: &mut ContextPart,
+    ) -> Result<Option<Obj>> {
         let line = self.line;
         let mut extension = self.extension;
         let mut block = self.block;
@@ -109,12 +109,12 @@ impl NodeS {
         _extension: &mut Vec<Line>,
         _block: &mut Vec<Line>,
         // _space: &mut Space,
-        _context: &mut ContextPart<Object>,
+        _context: &mut ContextPart,
     ) {
     }
 }
 
-// TODO: macro.
+// To be done: macro.
 impl NodeS {
     pub fn new_p(phrase: Vec<NodeS>, span: Span) -> Self {
         let node = Node::Phrase(phrase);

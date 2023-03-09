@@ -1,11 +1,14 @@
 #![feature(once_cell)]
-mod common;
+#![feature(trait_upcasting)]
 
+mod common;
+mod glue;
+
+#[allow(unused)]
 mod ast;
+#[allow(unused)]
 mod dfg;
 mod parser;
-
-mod glue;
 
 /// `location::Context as File` -> Result<parser::Ast>.
 pub use parser::parse;

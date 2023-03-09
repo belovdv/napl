@@ -1,55 +1,48 @@
+use std::collections::HashMap;
 use std::marker::PhantomData;
 
 use crate::common::symbol::Symbol;
 
-use crate::common::space::Id;
+use crate::common::space::{Id, Space};
 
 /// Basic struct that determines behavior of ast.
-pub struct ContextPart<T> {
-    _ty: PhantomData<T>,
+pub struct Context {
+    layers: Vec<ContextPart>,
 }
 
-pub struct Context<T> {
-    data: Vec<ContextPart<T>>,
+/// Basic struct that determines behavior of ast.
+#[derive(Default, Clone)]
+pub struct ContextPart {
+    context: HashMap<Symbol, Id>,
 }
 
-impl<T> ContextPart<T> {
-    fn _set_meaning(&mut self, _symbol: Symbol, _meaning: ()) -> ! {
-        todo!()
+impl ContextPart {
+    fn set_meaning(&mut self, symbol: Symbol, meaning: Id) {
+        self.context.insert(symbol, meaning);
     }
     /// `Context` determines meaning of each `Symbol`.
-    fn _meaning(&self, _symbol: Symbol) -> Id {
-        todo!()
+    fn meaning(&self, symbol: Symbol) -> Option<Id> {
+        self.context.get(&symbol).map(|&i| i)
     }
 }
 
-impl<T> Context<T> {
+impl Context {
     /// Actual context is combination of sequence of `Context`s,
     ///     overlapping each over.
     /// This adds new layer on stack.
-    pub fn push(&self, _cover: Self) -> Self {
-        todo!()
+    pub fn push(&mut self, cover: ContextPart) {
+        self.layers.push(cover)
+    }
+    pub fn pop(&mut self) {
+        self.layers.pop();
     }
 
-    pub fn set_meaning(&mut self, _symbol: Symbol, _meaning: ()) -> ! {
-        todo!()
+    pub fn set_meaning(&mut self, symbol: Symbol, meaning: Id) {
+        // This should be called only with layers in it.
+        self.layers.last_mut().unwrap().set_meaning(symbol, meaning)
     }
     /// `Context` determines meaning of each `Symbol`.
-    pub fn meaning(&self, _symbol: Symbol) -> Id {
-        todo!()
-    }
-}
-
-impl<T> Default for ContextPart<T> {
-    fn default() -> Self {
-        let _ty = Default::default();
-        Self { _ty }
-    }
-}
-
-impl<T> Clone for ContextPart<T> {
-    fn clone(&self) -> Self {
-        let _ty = self._ty;
-        Self { _ty }
+    pub fn meaning(&self, symbol: Symbol) -> Option<Id> {
+        self.layers.iter().rev().find_map(|s| s.meaning(symbol))
     }
 }

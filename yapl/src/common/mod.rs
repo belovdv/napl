@@ -1,4 +1,7 @@
 pub mod error;
 pub mod location;
-pub mod symbol;
 pub mod space;
+pub mod symbol;
+
+pub use space::{Id, Space};
+pub use symbol::Symbol;

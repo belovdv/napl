@@ -1,15 +1,18 @@
-use std::{fmt::Debug, sync::{LazyLock, Mutex}};
+use std::{
+    fmt::Debug,
+    sync::{LazyLock, Mutex},
+};
 
 use super::space::{Id, Space};
 
 static mut SYMBOLS: LazyLock<Mutex<Space<String>>> = LazyLock::new(|| Default::default());
 
-#[derive(Clone, Copy, PartialEq, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub struct Symbol(Id);
 
 impl From<String> for Symbol {
     fn from(value: String) -> Self {
-        Self(unsafe { SYMBOLS.lock().unwrap().insert(value) })
+        Self(unsafe { SYMBOLS.lock().unwrap().insert_unique(value) })
     }
 }
 

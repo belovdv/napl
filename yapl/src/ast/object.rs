@@ -1,29 +1,54 @@
-// To be done: there will be unit actions on objects in this file.
-
-/// All is an object.
-#[derive(Default)]
 pub enum Object {
-    #[default]
-    None, // To be done: is it necessary?
-    Action(Action),
     Set(Set),
     Instance(Set),
+    Derived { from: Box<Object>, act: Action },
+    Function(Function),
 }
 
-pub enum Action {}
+pub use set::Set;
+pub mod set {
+    pub enum Set {
+        Unit(Unit),
+        Algebraic(Algebraic),
+    }
 
-pub enum Predicate {}
-
-// To be done: this should be able to refer to `Id`.
-pub enum Set {
-    Product(Vec<Set>),
-    Sum(Vec<Set>),
-    Atom(SetAtom),
-    Sequence(Box<Set>),
-    Filtered(Box<Set>, Predicate),
+    pub enum Algebraic {
+        Sum(Vec<Set>),
+        Product(Vec<Set>),
+        Union(Vec<Set>),
+        Pow(Box<Set>, Box<Set>),
+    }
+    pub enum Unit {
+        Unit,
+        Bool,
+        Number(Number),
+    }
+    pub enum Number {
+        Integer,
+        Float,
+    }
 }
 
-pub enum SetAtom {
-    Integer,
-    Character,
+pub use action::Action;
+pub mod action {
+    pub enum Action {
+        User,
+        Arithmetic(Arithmetic),
+    }
+
+    pub enum Arithmetic {
+        Sum,   // Take many terms.
+        Mul,   // Take many terms.
+        Minus, // Take one term.
+        Pow,   // Take two terms.
+    }
 }
+
+pub use function::Function;
+pub mod function {
+    pub struct Function {}
+}
+
+/*
+    macro(type, property_type, *(name: property_val))
+*/

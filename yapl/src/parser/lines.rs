@@ -93,6 +93,10 @@ fn parse_inner(tokens: &mut Tokens, begin: Span) -> Result<Option<Expr>, Error> 
             while let Some(_) = tokens.next() {} // `. ` is a comment - drain iterator.
             Ok(None)
         }
+        Some((Token::Word(w), s)) => Ok(Some(Expr::new_i(
+            Box::new(Expr::new_c(vec![w], s)),
+            begin + s,
+        ))),
         Some((_, span)) => raise_error!(UnexpectedToken, span,),
         None => raise_error!(UnexpectedEndOfLine, begin,),
     }

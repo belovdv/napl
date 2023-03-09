@@ -1,6 +1,8 @@
+#![feature(once_cell)]
 mod common;
 
 mod ast;
+mod dfg;
 mod parser;
 
 mod glue;

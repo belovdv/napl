@@ -1,4 +1,5 @@
-use super::symbol::BracketType;
+// To be done: is pub necessary?
+pub use super::symbol::BracketType;
 
 use crate::common::location::{self, implement_has_span, Span};
 use crate::common::symbol::Symbol;
@@ -15,25 +16,26 @@ pub struct File<'file> {
     span: Span,
 }
 
-#[derive(Debug, PartialEq, getset::CopyGetters, Serialize, Deserialize)]
+// To be done: write template ast to not copy.
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Line {
-    sent: Sent,
-    extension: Vec<Line>,
-    block: Vec<Line>,
-    #[getset(get_copy = "pub")]
-    span: Span, // Starts from `sent`. Contains all sub lines.
+    pub sent: Sent,
+    pub extension: Vec<Line>,
+    pub block: Vec<Line>,
+    pub span: Span, // Starts from `sent`. Contains all sub lines.
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Sent {
-    sent: Vec<Expr>,
-    span: Span,
+    pub sent: Vec<Expr>,
+    pub span: Span,
 }
 
 #[derive(Debug, PartialEq, derive_new::new, Serialize, Deserialize)]
 pub struct Expr {
-    expr: ExprT,
-    span: Span,
+    pub expr: ExprT,
+    pub span: Span,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]

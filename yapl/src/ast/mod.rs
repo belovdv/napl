@@ -1,6 +1,7 @@
-mod ast;
-mod context;
-mod object;
+// TODO: remove pub.
+pub mod ast;
+pub mod context;
+pub mod object;
 
 pub use object::Object;
 pub use ast::Project;

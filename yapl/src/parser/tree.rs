@@ -23,7 +23,7 @@ where
                 result.push(line)
             }
             (of, l) => {
-                let l_s = l.span().begin();
+                let l_s = l.span.begin();
                 let of = *of as usize;
                 raise_error!(WrongLineOffset, Span::new(l_s, l_s.advanced(of)), of)
             }

@@ -1,0 +1,33 @@
+.fn fib(arg: .unsigned) -> .unsigned
+  { req .unsigned }[arg]
+        0 => 0
+        1 => 1
+    + [-1] [-2]
+
+.fn read_and_sum(arg: .unsigned) -> .int
+  { gen arg }.fold(+)
+    .read(.int)
+
+.fn read_and_check_if_all_more_3_mod_7(arg: .unsigned) -> .string
+  .fn mod_7(a: .int) -> .int
+    % a 7
+  .fn more_3(a: .int) -> .bool
+    > a 3
+  = result { gen arg }.map(mod_2).map(more_3).fold(+)
+    .read(.int)
+  match result
+    .true
+      "yes"
+    .false
+      "no"
+
+
+.fn process(type: .type, f: .fn) -> ()
+  = a .read(type)
+  = b f(a)
+  .print(b)
+
+.fn main
+  process(.unsigned, fib)
+  process(.unsigned, read_and_sum)
+  process(.unsigned, read_and_check_if_all_more_3_mod_7)

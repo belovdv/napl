@@ -8,6 +8,7 @@ pub struct Id {
     // _ty: PhantomData<T>,
 }
 
+#[derive(Debug)]
 pub struct Space<T> {
     data: Vec<T>,
 }
@@ -44,7 +45,7 @@ impl Id {
     }
 }
 
-impl<T: std::cmp::PartialEq> Default for Space<T> {
+impl<T> Default for Space<T> {
     fn default() -> Self {
         Self {
             data: Default::default(),

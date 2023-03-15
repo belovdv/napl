@@ -1,159 +1,107 @@
-pub trait Set {
-    type Item;
+use std::cmp::Ordering;
 
-    fn as_dict(&self) -> Option<&dyn Dict<Item = Self::Item>> {
-        self.as_sequence()
-            .map(|s| s as &dyn Dict<Item = Self::Item>)
+use super::{ObjS, Space};
+
+// To be done: algebraic description of operations and, most important, `Any` and `Unit`.
+
+pub enum Set {
+    Any,          // The Superset - contains all sets and their elements (func?) except self.
+    Unit,         // Auxiliary, recurrent: Unit = { Unit }. To be done: recurrent??
+    Integer,      // Superset for int.
+    Unsigned,     // [0, +inf) - base for infinite sequences.
+    Range(usize), // [0, val) - Base for finite sequences.
+
+    AnySet,  // Superset - contains all sets including self.
+    AnySeq,  // Superset - contains all sequential sets including self.
+    AnyFunc, // Superset - contains all functions.
+
+    // Expected at least two args.
+    Sum(Vec<ObjS>),          // Enum.
+    Product(Vec<ObjS>),      // Tuple.
+    Union(Vec<ObjS>),        // After match branches.
+    Intersection(Vec<ObjS>), // Trait sum.
+
+    // Superset for functions. To be done: from - vec?
+    Pow {
+        from: ObjS,
+        to: ObjS,
+        with_type: ObjS,
+    },
+    // Predicate?
+    Difference {
+        from: ObjS,
+        sub: ObjS,
+    },
+}
+
+impl Set {
+    pub fn get_superset(&self, space: &Space) -> ObjS {
+        space.b_s.any // To be done: a bit of preciseness... It's unused now.
     }
-    fn as_sequence(&self) -> Option<&dyn Sequence<Item = Self::Item>> {
+    pub fn get_elemets_set_type(&self, space: &Space) -> ObjS {
+        // To be done: Check.
+        match self {
+            Set::Any | Set::AnySet | Set::AnySeq => space.b_s.any,
+
+            Set::Union(obs) | Set::Intersection(obs) => {
+                obs[0].get(&space.s).get_elemets_set_type(space)
+            }
+            Set::Pow { with_type, .. } => *with_type,
+            Set::Difference { from, .. } => from.get(&space.s).get_elemets_set_type(space),
+
+            Set::Product(_) | Set::Sum(_) => space.b_s.unit, // Check.
+            Set::AnyFunc | Set::Unit | Set::Integer | Set::Unsigned | Set::Range(_) => {
+                space.b_s.unit
+            }
+        }
+    }
+
+    // To be done: what is `sequential` exactly?
+    pub fn is_sequential(&self, space: &Space) -> bool {
+        match &self {
+            Set::Unsigned | Self::Range(_) | Self::Unsigned => true,
+            Set::Union(_)
+            | Set::AnySeq
+            | Set::Sum(_)
+            | Set::Pow { .. }
+            | Set::AnyFunc
+            | Set::AnySet
+            | Set::Unit
+            | Set::Any
+            | Set::Integer
+            | Set::Pow { .. }
+            | Set::Product(_) => false,
+
+            Set::Product(v) => v.iter().all(|s| s.get(&space.s).is_sequential(space)),
+            Set::Intersection(v) => v.iter().any(|s| s.get(&space.s).is_sequential(space)),
+            Set::Difference { from, .. } => from.get(&space.s).is_sequential(space),
+        }
+    }
+    pub fn is_finite(&self, space: &Space) -> bool {
+        match self {
+            Set::Unit | Set::Range(_) => true,
+
+            Set::Any | Set::Integer | Set::Unsigned | Set::AnySet | Set::AnySeq | Set::AnyFunc => {
+                false
+            }
+
+            Set::Pow { from, to, .. } => {
+                from.get(&space.s).is_finite(space) && to.get(&space.s).is_finite(space)
+            }
+            Set::Union(v) | Set::Product(v) | Set::Sum(v) => {
+                v.iter().all(|s| s.get(&space.s).is_finite(space))
+            }
+            Set::Intersection(v) => v.iter().any(|s| s.get(&space.s).is_finite(space)),
+            Set::Difference { from, .. } => from.get(&space.s).is_finite(space),
+        }
+    }
+
+    // R `None` if couldn't prove any. To be done: a bit of preciseness... It's unused now.
+    pub fn is_subset_of(&self, other: &Set) -> Option<Ordering> {
         None
     }
-    fn is_finite(&self) -> bool {
-        self.get_size().is_some()
-    }
-    fn get_size(&self) -> Option<usize> {
+    // R `None` if couldn't prove any. To be done: a bit of preciseness... It's unused now.
+    pub fn is_superset_for(&self, other: &Set) -> Option<Ordering> {
         None
-    }
-}
-
-pub trait Dict: Set {
-    fn key(&self) {}
-    fn value(&self) {}
-    fn get(&self) {}
-}
-pub trait Sequence<'a>: Dict {
-    fn iter(&'a self) -> Box<dyn Iterator<Item = &'a Self::Item> + 'a>;
-}
-
-impl<'a, T> Dict for T where T: Sequence<'a> {}
-
-// To be done: proc macro.
-
-pub mod imp {
-    use super::*;
-
-    pub struct Unit; // Supportive.
-    impl Set for Unit {
-        type Item = ();
-        fn get_size(&self) -> Option<usize> {
-            Some(1)
-        }
-    }
-    static UNIT: Unit = Unit;
-
-    pub struct Bool;
-    impl Set for Bool {
-        type Item = bool;
-        fn get_size(&self) -> Option<usize> {
-            Some(2)
-        }
-    }
-
-    pub struct Range(usize);
-    impl Set for Range {
-        type Item = usize;
-        fn get_size(&self) -> Option<usize> {
-            Some(self.0)
-        }
-        fn as_sequence(&self) -> Option<&dyn Sequence<Item = Self::Item>> {
-            Some(self)
-        }
-    }
-    impl<'a> Sequence<'a> for Range {
-        fn iter(&self) -> Box<dyn Iterator<Item = &Self::Item>> {
-            Box::new((0..self.0).into_iter().map(|_| &0))
-        }
-    }
-
-    pub struct Unsigned;
-    impl Set for Unsigned {
-        type Item = usize;
-        fn as_sequence(&self) -> Option<&dyn Sequence<Item = Self::Item>> {
-            Some(self)
-        }
-    }
-    impl<'a> Sequence<'a> for Unsigned {
-        fn iter(&self) -> Box<dyn Iterator<Item = &Self::Item>> {
-            Box::new((0 as usize..).into_iter().map(|_| &0))
-        }
-    }
-
-    pub struct Integer;
-    impl Set for Integer {
-        type Item = i64;
-        fn as_dict(&self) -> Option<&dyn Dict<Item = Self::Item>> {
-            Some(self)
-        }
-    }
-    impl Dict for Integer {}
-
-    pub struct Float;
-    impl Set for Float {
-        type Item = f32;
-    }
-
-    pub struct Sum<T: Set>(Vec<T>);
-    impl<T: Set> Set for Sum<T> {
-        type Item = T;
-        fn is_finite(&self) -> bool {
-            self.0.iter().all(|s| s.is_finite())
-        }
-        fn get_size(&self) -> Option<usize> {
-            if !self.is_finite() {
-                return None;
-            }
-            Some(self.0.iter().filter_map(|s| s.get_size()).sum())
-        }
-    }
-
-    pub struct Product<T: Set>(Vec<T>);
-    impl<'a, T: Set> Set for Product<T> {
-        type Item = T;
-        fn is_finite(&self) -> bool {
-            self.0.iter().all(|s| s.is_finite())
-        }
-        fn get_size(&self) -> Option<usize> {
-            if !self.is_finite() {
-                return None;
-            }
-            Some(self.0.iter().filter_map(|s| s.get_size()).product())
-        }
-        fn as_sequence(&self) -> Option<&dyn Sequence<Item = Self::Item>> {
-            Some(self)
-        }
-    }
-    impl<'a, T: Set> Sequence<'a> for Product<T> {
-        fn iter(&'a self) -> Box<dyn Iterator<Item = &Self::Item> + 'a> {
-            Box::new(self.0.iter())
-        }
-    }
-}
-
-mod deprecated {
-    pub enum Set {
-        // Basic.
-        Unit,
-        Bool,
-        // Numbers.
-        // To be done: bigint.
-        Range(usize), //< Integer [0, size).
-        Unsigned,     //< Integer [0, +inf).
-        Integer,      //< Integer (-inf, +inf).
-        Float,        //< Real (-inf, +inf).
-
-        // Product.
-        Sum(Vec<Set>),
-        Product(Vec<Set>),
-        Union(Vec<Set>),
-        Pow(Box<Set>, usize),
-        Sequence(Box<Set>),
-        FiniteSequence(Box<Set>),
-        BoundedSequence(Box<Set>, usize), // ???
-    }
-
-    impl Set {
-        pub fn is_dict() {}
-        pub fn is_sequence() {}
-        pub fn is_finite() {}
     }
 }

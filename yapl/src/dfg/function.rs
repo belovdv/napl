@@ -1,18 +1,26 @@
-use super::r#trait;
-use super::set::{self, Set};
-use super::{Obj, Object};
+use super::{ObjF, ObjI, ObjS, Set, Space};
 
-pub trait Function {
-    // fn output(&self, input: &Vec<Box<dyn Set>>) -> Option<Box<dyn Set>>;
+pub enum Function {
+    Unit,
+
+    Map { input: ObjI, f: ObjF },
+    Fold { input: ObjI, f: ObjF },
+
+    Defined { input: Vec<ObjI>, output: ObjI },
 }
 
-pub mod imp {
-    use super::*;
+impl Function {
+    pub fn new_def(input: Vec<ObjI>, output: ObjI, space: &mut Space) -> ObjF {
+        // assert(all dependency ways from output come to input)
+        ObjF::new(&mut space.f, Self::Defined { input, output })
+    }
 
-    pub struct Map {}
-    impl Function for Map {
-        // fn output(&self, input: &Vec<Box<dyn Set>>) -> Option<Box<dyn Set>> {
-        //     todo!()
-        // }
+    pub fn get_output(&self, space: &Space) -> ObjS {
+        match self {
+            Function::Unit => space.b_s.unit,
+            Function::Map { f, .. } => f.get_output(space),
+            Function::Fold { f, .. } => f.get_output(space),
+            Function::Defined { output, .. } => output.get(&space.i).get_set(space),
+        }
     }
 }

@@ -10,6 +10,12 @@ static mut SYMBOLS: LazyLock<Mutex<Space<String>>> = LazyLock::new(|| Default::d
 #[derive(Clone, Copy, PartialEq, Eq, Hash, serde::Serialize, serde::Deserialize)]
 pub struct Symbol(Id);
 
+impl Symbol {
+    // pub fn as_str(&self) -> &str {
+    //     unsafe { SYMBOLS.lock().unwrap().get(self.0) }
+    // }
+}
+
 impl From<String> for Symbol {
     fn from(value: String) -> Self {
         Self(unsafe { SYMBOLS.lock().unwrap().insert_unique(value) })
@@ -23,7 +29,7 @@ impl From<&'static str> for Symbol {
 }
 
 impl ToString for Symbol {
-    // To be done: replace by as_str.
+    // To be done: replace by `as_str`.
     fn to_string(&self) -> String {
         unsafe { SYMBOLS.lock().unwrap().get(self.0).to_string() }
     }
@@ -36,5 +42,12 @@ impl Debug for Symbol {
             self.0.as_u32(),
             self.to_string()
         ))
+    }
+}
+
+impl PartialEq<&str> for Symbol {
+    fn eq(&self, other: &&str) -> bool {
+        // To be done: replace by `as_str`.
+        self.to_string() == other.to_string()
     }
 }

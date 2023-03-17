@@ -24,7 +24,13 @@ Backend will be provided by other crates.
 
 ### Implemented parts
 
-Parser: initial version is implemented. Current version:
+Parser: initial version.
+
+### States
+
+#### Parser
+
+Initial version is implemented. Current version:
 
 - is expressive enough to work with,
 
@@ -33,3 +39,9 @@ Parser: initial version is implemented. Current version:
 - has basic diagnostic, but,
 
 - wasn't tested well.
+
+#### AST
+
+There are only some placeholders. There isn't errors processing.
+
+Current implementation assumes code passed to it is correct.

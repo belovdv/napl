@@ -1,4 +1,4 @@
-use super::{ObjF, ObjI, ObjS, Set, Space};
+use super::{ObjF, ObjI, ObjS, Space};
 
 pub enum Function {
     Unit,

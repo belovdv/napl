@@ -89,7 +89,7 @@ fn parse_expr(tokens: &mut Tokens, token: Token, span: Span) -> Result<Option<Ex
 
 fn parse_inner(tokens: &mut Tokens, begin: Span) -> Result<Option<Expr>, Error> {
     match tokens.next() {
-        Some((Token::Whitespace(1), _)) => {
+        Some((Token::Whitespace(_), _)) => {
             while let Some(_) = tokens.next() {} // `. ` is a comment - drain iterator.
             Ok(None)
         }

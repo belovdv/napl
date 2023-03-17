@@ -1,9 +1,8 @@
 use std::collections::HashMap;
-use std::marker::PhantomData;
 
 use crate::common::symbol::Symbol;
 
-use crate::common::space::{Id, Space};
+use crate::common::space::Id;
 
 /// Basic struct that determines behavior of ast.
 pub struct Context {

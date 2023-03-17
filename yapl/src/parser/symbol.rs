@@ -59,7 +59,7 @@ impl From<char> for SymbolType {
             '"' => Self::Quote,
             c if c.is_alphabetic() || c == '_' => Self::Letter(c),
             c if c.is_ascii_digit() => Self::Digit(c),
-            c if "<>+-*/=&|^!'#".contains(c) => Self::Special(c),
+            c if "<>+-*/=&|^!'#:%".contains(c) => Self::Special(c),
             '(' => Self::Bracket(BracketType::Round, true),
             '[' => Self::Bracket(BracketType::Square, true),
             '{' => Self::Bracket(BracketType::Curly, true),

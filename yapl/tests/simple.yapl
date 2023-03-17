@@ -1,6 +1,0 @@
-.fn square(a: .int) -> .int
-  * a a
-
-.proc read_and_sum_squares(amount: .int) -> .int
-  { gen amount }.map(square).fold(+)
-    .read(.int)

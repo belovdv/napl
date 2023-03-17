@@ -1,0 +1,45 @@
+.fn square(a: .int) -> .int
+  * a a
+
+.fn rif(ar: .int)
+  = a + ar 2
+  = b + * a 2 - ar 2
+
+. .fn read_and_sum_squares(amount: .int) -> .int
+.   { gen amount }.map(square).fold(+)
+.     .read(.int)
+
+. .fn fib(arg: .unsigned) -> .unsigned
+.   { req .unsigned }[arg]
+.         0 => 0
+.         1 => 1
+.     + [-1] [-2]
+
+. .fn read_and_sum(arg: .unsigned) -> .int
+.   { gen arg }.fold(+)
+.     .read(.int)
+
+. .fn read_and_check_if_all_more_3_mod_7(arg: .unsigned) -> .string
+.   .fn mod_7(a: .int) -> .int
+.     % a 7
+.   .fn more_3(a: .int) -> .bool
+.     > a 3
+.   = result { gen arg }.map(more_3).fold(+)
+.     mod_2 .read(.int)
+.   match result
+.     .true
+.       "yes"
+.     .false
+.       "no"
+.   result
+
+
+. .fn process(type: .type, f: .fn) -> ()
+.   = a .read(type)
+.   = b f(a)
+.   .print(b)
+
+. .fn main(args: .placeholder)
+.   process(.unsigned, fib)
+.   process(.unsigned, read_and_sum)
+.   process(.unsigned, read_and_check_if_all_more_3_mod_7)

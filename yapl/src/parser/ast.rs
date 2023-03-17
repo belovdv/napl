@@ -42,6 +42,7 @@ pub struct Expr {
 pub enum ExprT {
     Inner(Box<Expr>),
     Special(Symbol),
+    // To be done: `head: Box<ExprT>`, `tail: Vec<Symbol>` or smth similar.
     Chain(Vec<Symbol>),
     Bracket(BracketType, Vec<Sent>),
     LitStr(String),

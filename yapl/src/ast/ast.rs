@@ -1,38 +1,15 @@
-use crate::common::error::Result;
 use crate::common::location::Span;
 use crate::common::symbol::Symbol;
-use crate::common::Id as Obj;
 
 use super::context::ContextPart;
-
-// pub type Id = crate::common::space::Id;
-// pub type Space = crate::common::space::Space<Value>;
-
-pub struct Project {
-    // space: Space,
-    // files: HashMap<PathBuf, File>,
-    roots: Vec<Line>,
-}
+use super::{builtin, project};
 
 #[derive(Debug, Clone, derive_new::new)]
 pub struct Line {
     line: NodeS,
     extension: Vec<Line>,
     block: Vec<Line>,
-    // #[new(default)]
-    // context: Context<Object>,
     span: Span,
-}
-
-pub enum Value {
-    Object(Obj),
-    Action(Action),
-}
-
-impl PartialEq for Value {
-    fn eq(&self, _other: &Self) -> bool {
-        todo!()
-    }
 }
 
 #[derive(Debug, Clone, derive_new::new)]
@@ -63,54 +40,95 @@ pub enum Bracket {
     Curly,
 }
 
-// To be done: this should be primary way to access ast.
-// To be done: this should be able to modify ast.
-pub struct Access<'project> {
-    ast: &'project Project,
-}
-
-impl Project {
-    pub fn new(roots: Vec<Line>) -> Self {
-        // let space = Space::default();
-        Self { /* space,*/ roots, }
-    }
-
-    pub fn interpret(self) -> Result<Vec<Obj>> {
-        let mut context = Default::default();
-        // let mut space = self.space;
-        let roots: Result<Vec<_>> = self
-            .roots
-            .into_iter()
-            .map(|r| r.act(/* &mut space, */ &mut context))
-            .collect();
-        roots.map(|v| v.into_iter().flatten().collect())
-    }
-}
+// To be done: these placeholders should be more generic.
 
 impl Line {
-    fn act(
-        self,
-        /* space: &mut Space, */
-        context: &mut ContextPart,
-    ) -> Result<Option<Obj>> {
+    // To be done: this is placeholder.
+    pub fn act(self, _context: &mut ContextPart) -> project::Function {
         let line = self.line;
-        let mut extension = self.extension;
-        let mut block = self.block;
+        // let mut extension = self.extension;
+        let block = self.block;
         // let span = self.span;
-        line.process_sub_lines(&mut extension, &mut block, /* space, */ context);
 
-        Ok(None)
+        let Node::Phrase(phrase) = &line.node else {
+            panic!()
+        };
+
+        match &phrase[0].node {
+            Node::Chain(c) if c[0] == "." && c[1] == "fn" => {}
+            _ => panic!(),
+        }
+
+        let name = match &phrase[1].node {
+            Node::Chain(v) if v.len() == 1 => v[0],
+            _ => panic!(),
+        };
+
+        let args = match &phrase[2].node {
+            Node::Bracket(Bracket::Round, args) => args,
+            _ => panic!(),
+        };
+        let args = args
+            .iter()
+            .map(|s| match &s.node {
+                Node::Phrase(p) if p.len() == 3 => match &p[0].node {
+                    Node::Chain(c) if c.len() == 1 => c[0],
+                    _ => panic!(),
+                },
+                _ => panic!(),
+            })
+            .collect();
+
+        let stmts = block.into_iter().map(|n| n.subline()).collect();
+
+        project::Function { name, args, stmts }
+    }
+
+    fn subline(self) -> project::Statement {
+        let vsp = self.line.node.process(&self.block);
+        dbg!(&vsp);
+        vsp
     }
 }
 
-impl NodeS {
-    fn process_sub_lines(
-        &self,
-        _extension: &mut Vec<Line>,
-        _block: &mut Vec<Line>,
-        // _space: &mut Space,
-        _context: &mut ContextPart,
-    ) {
+impl Node {
+    fn process(self, block: &Vec<Line>) -> project::Statement {
+        match self {
+            Node::Phrase(p) => Self::process_phrase(&mut p.into_iter(), &block),
+            Node::Bracket(Bracket::Curly, _) => todo!(),
+            Node::Chain(c) => {
+                let base = project::Statement::Symbol(c[0]);
+                match c.len() {
+                    1 => base,
+                    _ => project::Statement::Inner {
+                        from: Box::new(base),
+                        with: c[1..].iter().map(|&c| c).collect(),
+                    },
+                }
+            }
+            Node::LitStr(s) => project::Statement::ConstantS(s),
+            Node::LitInt(i) => project::Statement::ConstantI(i),
+            _ => panic!(),
+        }
+    }
+
+    fn process_phrase(
+        phrase: &mut dyn Iterator<Item = NodeS>,
+        block: &Vec<Line>,
+    ) -> project::Statement {
+        match phrase.next().unwrap().node.process(block) {
+            project::Statement::Symbol(s) => match builtin::operator(s) {
+                Some(num) => project::Statement::Mapped {
+                    func: s,
+                    args: (0..num)
+                        .map(|_| Self::process_phrase(phrase, block))
+                        .collect(),
+                },
+                None => project::Statement::Symbol(s),
+            },
+            // project::Statement::Set { ty, args, stmts } => todo!(),
+            s => s,
+        }
     }
 }
 

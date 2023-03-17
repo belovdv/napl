@@ -1,13 +1,13 @@
 use std::path::PathBuf;
 
-use yapl::{parse, parser2ast, File};
+use yapl::{parse, File};
 
 #[test]
-fn basics() {
-    let path: PathBuf = "tests/auxiliary/test_basics.yapl".into();
+fn parser() {
+    let path: PathBuf = "tests/auxiliary/test_parser.yapl".into();
     let context = File::new_read(path.clone()).unwrap();
 
-    let out = path.parent().unwrap().join("test_basics.out");
+    let out = path.parent().unwrap().join("test_parser.out");
     let parsed = match parse(&context) {
         Ok(r) => r,
         Err(ers) => {
@@ -27,10 +27,6 @@ fn basics() {
     // std::fs::write(json_file, json_str).unwrap();
 
     assert!(result == expected);
-
-    let ast = parser2ast(&parsed).unwrap();
-    let out = path.parent().unwrap().join("test_basics_ast.out");
-    std::fs::write(out, format!("{:#?}", &ast)).unwrap();
 
     // let out_ast = path.parent().unwrap().join("test_basics_ast.out");
     // let ast = parser2ast(&parsed);

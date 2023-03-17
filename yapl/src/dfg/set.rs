@@ -59,7 +59,7 @@ impl Set {
     // To be done: what is `sequential` exactly?
     pub fn is_sequential(&self, space: &Space) -> bool {
         match &self {
-            Set::Unsigned | Self::Range(_) | Self::Unsigned => true,
+            Set::Unsigned | Self::Range(_) => true,
             Set::Union(_)
             | Set::AnySeq
             | Set::Sum(_)
@@ -68,9 +68,7 @@ impl Set {
             | Set::AnySet
             | Set::Unit
             | Set::Any
-            | Set::Integer
-            | Set::Pow { .. }
-            | Set::Product(_) => false,
+            | Set::Integer => false,
 
             Set::Product(v) => v.iter().all(|s| s.get(&space.s).is_sequential(space)),
             Set::Intersection(v) => v.iter().any(|s| s.get(&space.s).is_sequential(space)),
@@ -97,11 +95,11 @@ impl Set {
     }
 
     // R `None` if couldn't prove any. To be done: a bit of preciseness... It's unused now.
-    pub fn is_subset_of(&self, other: &Set) -> Option<Ordering> {
+    pub fn _is_subset_of(&self, _other: &Set) -> Option<Ordering> {
         None
     }
     // R `None` if couldn't prove any. To be done: a bit of preciseness... It's unused now.
-    pub fn is_superset_for(&self, other: &Set) -> Option<Ordering> {
+    pub fn _is_superset_for(&self, _other: &Set) -> Option<Ordering> {
         None
     }
 }

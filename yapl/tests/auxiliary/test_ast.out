@@ -1,0 +1,83 @@
+[
+    Function {
+        name: Symbol(1: "square"),
+        args: [
+            Symbol(2: "a"),
+        ],
+        stmts: [
+            Mapped {
+                func: Symbol(6: "*"),
+                args: [
+                    Symbol(
+                        Symbol(2: "a"),
+                    ),
+                    Symbol(
+                        Symbol(2: "a"),
+                    ),
+                ],
+            },
+        ],
+    },
+    Function {
+        name: Symbol(7: "rif"),
+        args: [
+            Symbol(8: "ar"),
+        ],
+        stmts: [
+            Mapped {
+                func: Symbol(9: "="),
+                args: [
+                    Symbol(
+                        Symbol(2: "a"),
+                    ),
+                    Mapped {
+                        func: Symbol(10: "+"),
+                        args: [
+                            Symbol(
+                                Symbol(8: "ar"),
+                            ),
+                            ConstantI(
+                                2,
+                            ),
+                        ],
+                    },
+                ],
+            },
+            Mapped {
+                func: Symbol(9: "="),
+                args: [
+                    Symbol(
+                        Symbol(11: "b"),
+                    ),
+                    Mapped {
+                        func: Symbol(10: "+"),
+                        args: [
+                            Mapped {
+                                func: Symbol(6: "*"),
+                                args: [
+                                    Symbol(
+                                        Symbol(2: "a"),
+                                    ),
+                                    ConstantI(
+                                        2,
+                                    ),
+                                ],
+                            },
+                            Mapped {
+                                func: Symbol(12: "-"),
+                                args: [
+                                    Symbol(
+                                        Symbol(8: "ar"),
+                                    ),
+                                    ConstantI(
+                                        2,
+                                    ),
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    },
+]

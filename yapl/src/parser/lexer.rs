@@ -43,7 +43,8 @@ impl<'a> Lexer<'a> {
             SymbolType::Digit(c) => number(&mut self.stream, begin, c)?,
             SymbolType::Special(c) => special(&mut self.stream, begin, c)?,
             SymbolType::Whitespace(w) => whitespace(&mut self.stream, begin, w)?,
-            _ => raise_error!(UnsupportedSymbol, self.stream.span(begin),),
+            SymbolType::Other(s) => raise_error!(UnsupportedSymbol, self.stream.span(begin), s),
+            SymbolType::EOS => raise_error!(UnexpectedEOS, self.stream.span(begin),),
         };
         Ok((result, self.stream.span(begin)))
     }
@@ -88,7 +89,7 @@ fn whitespace(stream: &mut Stream, begin: Position, first: usize) -> Result<Toke
                 result += w;
                 stream.next().unwrap();
             }
-            SymbolType::Other(_) => raise_error!(UnsupportedSymbol, stream.span(begin),),
+            SymbolType::Other(s) => raise_error!(UnsupportedSymbol, stream.span(begin), s),
             _ => return Ok(Token::Whitespace(result)),
         }
     }
@@ -99,7 +100,7 @@ fn word(stream: &mut Stream, begin: Position, start: char) -> Result<Token> {
     loop {
         match SymbolType::from(stream.chars.peek().map(|&c| c)) {
             SymbolType::Letter(_) | SymbolType::Digit(_) => result.push(stream.next().unwrap()),
-            SymbolType::Other(_) => raise_error!(UnsupportedSymbol, stream.span(begin),),
+            SymbolType::Other(s) => raise_error!(UnsupportedSymbol, stream.span(begin), s),
             _ => return Ok(Token::Word(Symbol::from(result))),
         }
     }
@@ -110,7 +111,7 @@ fn special(stream: &mut Stream, begin: Position, start: char) -> Result<Token> {
     loop {
         match SymbolType::from(stream.chars.peek().map(|&c| c)) {
             SymbolType::Special(_) => result.push(stream.next().unwrap()),
-            SymbolType::Other(_) => raise_error!(UnsupportedSymbol, stream.span(begin),),
+            SymbolType::Other(s) => raise_error!(UnsupportedSymbol, stream.span(begin), s),
             _ => return Ok(Token::Special(Symbol::from(result))),
         }
     }
@@ -122,7 +123,7 @@ fn number(stream: &mut Stream, begin: Position, start: char) -> Result<Token> {
     loop {
         match SymbolType::from(stream.chars.peek().map(|&c| c)) {
             SymbolType::Letter(_) | SymbolType::Digit(_) => result.push(stream.next().unwrap()),
-            SymbolType::Other(_) => raise_error!(UnsupportedSymbol, stream.span(begin),),
+            SymbolType::Other(s) => raise_error!(UnsupportedSymbol, stream.span(begin), s),
             SymbolType::Dot => raise_error!(UnexpectedSymbol, stream.span(begin), '.'),
             _ => match result.parse::<i64>() {
                 Ok(r) => return Ok(Token::LitInt(r)),

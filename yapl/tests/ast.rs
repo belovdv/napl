@@ -21,7 +21,7 @@ fn ast() {
 
     let out = path.parent().unwrap().join("test_ast.out");
     let result = format!("{:#?}", &funcs);
-    std::fs::write(&out, &result).unwrap();
+    // std::fs::write(&out, &result).unwrap();
     let expected = std::fs::read_to_string(&out).unwrap();
     assert!(result == expected);
 }

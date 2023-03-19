@@ -13,3 +13,7 @@ fn func() -> (T)
       extend (doing [1 + 2345])
       extend doing 2
   return
+
+.fn test_set()
+  { gen 3 }.map(?).fold(+)
+    .read .int

@@ -8,6 +8,6 @@ error_struct!(ClosedBracket, "cannot find open pair for this bracket",);
 error_struct!(ClosingBracketNotFound, "cannot find closing bracket",);
 error_struct!(UnexpectedToken, "`inner` cannot be followed by this",);
 error_struct!(EmptyPartInBrackets, "parts in brackets shouldn't be empty",);
-error_struct!(UnexpectedEndOfLine, "End of line wasn't expected here",);
+error_struct!(UnexpectedEOL, "End of line wasn't expected here",);
 error_struct!(WrongLineOffset, "unexpected offset {}", offset: usize);
 error_struct!(NewLineOnFileEnd, "unexpected new line on the end of file",);

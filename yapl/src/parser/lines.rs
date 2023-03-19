@@ -3,8 +3,8 @@ use std::vec;
 
 use super::ast::{Expr, Line, Sent};
 use super::errors::{
-    ClosedBracket, ClosingBracketNotFound, EmptyPartInBrackets, NewLineOnFileEnd,
-    UnexpectedEndOfLine, UnexpectedSymbol, UnexpectedToken, WrongLineOffset,
+    ClosedBracket, ClosingBracketNotFound, EmptyPartInBrackets, NewLineOnFileEnd, UnexpectedEOL,
+    UnexpectedSymbol, UnexpectedToken, WrongLineOffset,
 };
 use super::lexer::{Lexer, Token};
 use super::symbol::{offset, BracketType};
@@ -36,7 +36,7 @@ pub fn parse(line: &str) -> Result<Vec<(usize, Line)>, Vec<Error>> {
 
     let mut result = Vec::new();
     for mut line in lines.into_iter() {
-        let (of, iter) = match line.first().map(|i| i.clone()) {
+        let (of, tokens) = match line.first().map(|i| i.clone()) {
             Some((Token::Whitespace(w), s)) if line.len() > 1 => match offset(w) {
                 Some(of) => (of, line.drain(1..).collect()),
                 None => {
@@ -47,7 +47,7 @@ pub fn parse(line: &str) -> Result<Vec<(usize, Line)>, Vec<Error>> {
             Some((_, _)) if line.len() > 0 => (0, line),
             _ => continue,
         };
-        match parse_line(&mut iter.into_iter().peekable()) {
+        match parse_line(&mut tokens.into_iter().peekable()) {
             Ok(Some(line)) => result.push((of, line)),
             Ok(None) => {}
             Err(e) => errors.push(e),
@@ -74,36 +74,44 @@ pub fn parse_line(tokens: &mut Tokens) -> Result<Option<Line>, Error> {
 }
 
 fn parse_expr(tokens: &mut Tokens, token: Token, span: Span) -> Result<Option<Expr>, Error> {
-    Ok(match token {
+    let result = match token {
         Token::Comma => raise_error!(UnexpectedSymbol, span, ','),
         Token::Bracket(_, false) => raise_error!(ClosedBracket, span,),
         Token::Dot => parse_inner(tokens, span)?,
-        Token::Word(w) => Some(parse_chain(tokens, w, span)?),
+        Token::Word(w) => Some(Expr::new_r(w, span)),
         Token::Bracket(bt, true) => Some(parse_bracket(tokens, bt, span)?),
-        Token::Special(s) => Some(Expr::new_s(s, span)),
+        Token::Special(s) => Some(Expr::new_r(s, span)),
         Token::LitInt(li) => Some(Expr::new_li(li, span)),
         Token::LitStr(ls) => Some(Expr::new_ls(ls, span)),
         _ => None,
-    })
+    };
+
+    let Some(result) = result else {
+        return Ok(None);
+    };
+
+    // To be done: this is wrong span.
+    let (chain, span_end) = parse_chain(tokens, span)?;
+    Ok(Some(match chain.len() {
+        0 => result,
+        _ => Expr::new_c(Box::new(result), chain, span + span_end),
+    }))
 }
 
 fn parse_inner(tokens: &mut Tokens, begin: Span) -> Result<Option<Expr>, Error> {
     match tokens.next() {
         Some((Token::Whitespace(_), _)) => {
-            while let Some(_) = tokens.next() {} // `. ` is a comment - drain iterator.
+            while let Some(_) = tokens.next() {} // Comment - drain iterator.
             Ok(None)
         }
-        Some((Token::Word(w), s)) => Ok(Some(Expr::new_i(
-            Box::new(Expr::new_c(vec![w], s)),
-            begin + s,
-        ))),
+        Some((Token::Word(w), s)) => Ok(Some(Expr::new_i(w, begin + s))),
         Some((_, span)) => raise_error!(UnexpectedToken, span,),
-        None => raise_error!(UnexpectedEndOfLine, begin,),
+        None => raise_error!(UnexpectedEOL, begin,),
     }
 }
 
-fn parse_chain(tokens: &mut Tokens, first: Symbol, from: Span) -> Result<Expr, Error> {
-    let mut chain = vec![first];
+fn parse_chain(tokens: &mut Tokens, from: Span) -> Result<(Vec<Symbol>, Span), Error> {
+    let mut chain = Vec::new();
     let mut to = from;
     while let Some((Token::Dot, _)) = tokens.peek() {
         let (_, span) = tokens.next().unwrap();
@@ -113,10 +121,10 @@ fn parse_chain(tokens: &mut Tokens, first: Symbol, from: Span) -> Result<Expr, E
                 w
             }
             Some((_, span)) => raise_error!(UnexpectedToken, span,),
-            None => raise_error!(UnexpectedEndOfLine, from + span,),
+            None => raise_error!(UnexpectedEOL, span,),
         })
     }
-    Ok(Expr::new_c(chain, from + to))
+    Ok((chain, to))
 }
 
 fn parse_bracket(tokens: &mut Tokens, bt: BracketType, from: Span) -> Result<Expr, Error> {

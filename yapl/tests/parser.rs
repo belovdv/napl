@@ -26,6 +26,9 @@ fn parser() {
     // let json_str = serde_json::to_string(parsed.roots()).unwrap();
     // std::fs::write(json_file, json_str).unwrap();
 
+    // let out = path.parent().unwrap().join("_test_parser.out");
+    // std::fs::write(out, &result).unwrap();
+
     assert!(result == expected);
 
     // let out_ast = path.parent().unwrap().join("test_basics_ast.out");

@@ -51,3 +51,10 @@ impl PartialEq<&str> for Symbol {
         self.to_string() == other.to_string()
     }
 }
+
+impl PartialEq<str> for Symbol {
+    fn eq(&self, other: &str) -> bool {
+        // To be done: replace by `as_str`.
+        self.to_string() == other.to_string()
+    }
+}

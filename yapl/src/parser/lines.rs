@@ -1,19 +1,19 @@
 use std::iter::Peekable;
 use std::vec;
 
-use super::ast::{Expr, Line, Sent};
+use super::ast::{Chain, Expr, Line, Sent};
 use super::errors::{
-    ClosedBracket, ClosingBracketNotFound, EmptyPartInBrackets, NewLineOnFileEnd, UnexpectedEOL,
-    UnexpectedSymbol, UnexpectedToken, WrongLineOffset,
+    ClosedBracket, ClosingBracketNotFound, NewLineOnFileEnd, UnexpectedEOL, UnexpectedToken,
+    WrongLineOffset,
 };
 use super::lexer::{Lexer, Token};
 use super::symbol::{offset, BracketType};
 
 use crate::common::error::{raise_error, Error};
 use crate::common::location::Span;
-use crate::common::symbol::Symbol;
+use crate::parser::ast::ExprT;
 
-// To be done: fix risen (after fixing using slices) code complexity.
+// To be done: fix risen code complexity.
 
 pub fn parse(line: &str) -> Result<Vec<(usize, Line)>, Vec<Error>> {
     // To be done: remove unnecessary allocations.
@@ -37,6 +37,7 @@ pub fn parse(line: &str) -> Result<Vec<(usize, Line)>, Vec<Error>> {
     let mut result = Vec::new();
     for mut line in lines.into_iter() {
         let (of, tokens) = match line.first().map(|i| i.clone()) {
+            // To be done: remove allocation.
             Some((Token::Whitespace(w), s)) if line.len() > 1 => match offset(w) {
                 Some(of) => (of, line.drain(1..).collect()),
                 None => {
@@ -48,8 +49,7 @@ pub fn parse(line: &str) -> Result<Vec<(usize, Line)>, Vec<Error>> {
             _ => continue,
         };
         match parse_line(&mut tokens.into_iter().peekable()) {
-            Ok(Some(line)) => result.push((of, line)),
-            Ok(None) => {}
+            Ok(s) => result.push((of, Line::new(s))),
             Err(e) => errors.push(e),
         }
     }
@@ -62,101 +62,74 @@ pub fn parse(line: &str) -> Result<Vec<(usize, Line)>, Vec<Error>> {
 
 type Tokens<'a> = Peekable<std::vec::IntoIter<(Token, Span)>>;
 
-pub fn parse_line(tokens: &mut Tokens) -> Result<Option<Line>, Error> {
-    let mut sent = Vec::new();
-    while let Some((token, span)) = tokens.next() {
-        sent.push(parse_expr(tokens, token, span)?)
-    }
-    match Sent::new(sent.into_iter().flatten().collect()) {
-        Some(sent) => Ok(Some(Line::new(sent))),
-        None => Ok(None),
-    }
-}
+fn parse_line(tokens: &mut Tokens) -> Result<Sent, Error> {
+    debug_assert!(!matches!(tokens.peek().unwrap(), (Token::Whitespace(_), _)));
 
-fn parse_expr(tokens: &mut Tokens, token: Token, span: Span) -> Result<Option<Expr>, Error> {
-    let result = match token {
-        Token::Comma => raise_error!(UnexpectedSymbol, span, ','),
-        Token::Bracket(_, false) => raise_error!(ClosedBracket, span,),
-        Token::Dot => parse_inner(tokens, span)?,
-        Token::Word(w) => Some(Expr::new_r(w, span)),
-        Token::Bracket(bt, true) => Some(parse_bracket(tokens, bt, span)?),
-        Token::Special(s) => Some(Expr::new_r(s, span)),
-        Token::LitInt(li) => Some(Expr::new_li(li, span)),
-        Token::LitStr(ls) => Some(Expr::new_ls(ls, span)),
-        _ => None,
-    };
-
-    let Some(result) = result else {
-        return Ok(None);
-    };
-
-    // To be done: this is wrong span.
-    let (chain, span_end) = parse_chain(tokens, span)?;
-    Ok(Some(match chain.len() {
-        0 => result,
-        _ => Expr::new_c(Box::new(result), chain, span + span_end),
-    }))
-}
-
-fn parse_inner(tokens: &mut Tokens, begin: Span) -> Result<Option<Expr>, Error> {
-    match tokens.next() {
-        Some((Token::Whitespace(_), _)) => {
-            while let Some(_) = tokens.next() {} // Comment - drain iterator.
-            Ok(None)
+    let mut chains = Vec::new();
+    while let Some((t, span)) = tokens.peek() {
+        match t {
+            Token::Whitespace(_) => {
+                tokens.next();
+            }
+            Token::Comma => raise_error!(UnexpectedToken, *span,),
+            Token::Bracket(_, false) => raise_error!(ClosedBracket, *span,),
+            _ => chains.push(parse_chain(tokens)?),
         }
-        Some((Token::Word(w), s)) => Ok(Some(Expr::new_i(w, begin + s))),
-        Some((_, span)) => raise_error!(UnexpectedToken, span,),
-        None => raise_error!(UnexpectedEOL, begin,),
     }
+
+    Ok(Sent::new(chains))
 }
 
-fn parse_chain(tokens: &mut Tokens, from: Span) -> Result<(Vec<Symbol>, Span), Error> {
+// Expects not `Comma`, "closing bracket" or `Whitespace` at the beginning. Doesn't consume end.
+fn parse_chain(tokens: &mut Tokens) -> Result<Chain, Error> {
     let mut chain = Vec::new();
-    let mut to = from;
-    while let Some((Token::Dot, _)) = tokens.peek() {
-        let (_, span) = tokens.next().unwrap();
-        chain.push(match tokens.next() {
-            Some((Token::Word(w), span)) => {
-                to = span;
-                w
+    while let Some((t, span)) = tokens.next() {
+        chain.push(match t {
+            Token::Dot => Expr::new(ExprT::new_dot(), span),
+            Token::LitInt(i) => Expr::new(ExprT::new_lit_int(i), span),
+            Token::LitStr(s) => Expr::new(ExprT::new_lit_str(s), span),
+            Token::Bracket(bt, true) => parse_bracket(tokens, bt, span)?,
+            Token::Word(s) | Token::Special(s) => Expr::new(ExprT::new_symbol(s), span),
+            _ => raise_error!(UnexpectedToken, span,),
+        });
+        match tokens.peek().map(|(t, _)| t) {
+            // `. ` starts comment. Consume iterator.
+            Some(Token::Whitespace(_)) if matches!(chain.last().unwrap().expr, ExprT::Dot) => {
+                tokens.count();
             }
-            Some((_, span)) => raise_error!(UnexpectedToken, span,),
-            None => raise_error!(UnexpectedEOL, span,),
-        })
+            Some(Token::Comma) | Some(Token::Whitespace(_)) => break,
+            Some(Token::Bracket(_, false)) => break,
+            _ => {}
+        };
     }
-    Ok((chain, to))
+    Ok(Chain::new(chain))
 }
 
-fn parse_bracket(tokens: &mut Tokens, bt: BracketType, from: Span) -> Result<Expr, Error> {
+// Expects first bracket to be already consumed.
+fn parse_bracket(tokens: &mut Tokens, ty: BracketType, from: Span) -> Result<Expr, Error> {
     let mut to = from;
-    let mut expr = Vec::new();
     let mut sent = Vec::new();
-    while let Some((token, span)) = tokens.next() {
-        to = span;
-        sent.push(match token {
+    let mut inner = Vec::new();
+    while let Some((token, span)) = tokens.peek() {
+        to = *span;
+        match token {
+            Token::Whitespace(_) => {
+                tokens.next();
+            }
             Token::Comma => {
-                expr.push(match Sent::new(sent) {
-                    Some(next) => next,
-                    None => raise_error!(EmptyPartInBrackets, from + to,),
-                });
-                sent = Vec::new();
-                continue;
+                inner.push(Sent::new(sent));
+                sent = Vec::new()
             }
-            Token::Bracket(t, false) if t == bt => {
-                if !expr.is_empty() && sent.is_empty() {
-                    raise_error!(EmptyPartInBrackets, from + to,)
+            Token::Bracket(bt, false) if *bt == ty => {
+                tokens.next();
+                if sent.len() > 0 {
+                    inner.push(Sent::new(sent));
                 }
-                match Sent::new(sent) {
-                    Some(next) => expr.push(next),
-                    None => {}
-                };
-                return Ok(Expr::new_b(bt, expr, from + to));
+                return Ok(Expr::new(ExprT::Bracket { ty, inner }, from + to));
             }
-            _ => match parse_expr(tokens, token, span)? {
-                Some(next) => next,
-                None => continue,
-            },
-        })
+            Token::NewLine => raise_error!(UnexpectedEOL, *span,),
+            _ => sent.push(parse_chain(tokens)?),
+        }
     }
     raise_error!(ClosingBracketNotFound, from + to,)
 }

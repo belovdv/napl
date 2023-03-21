@@ -9,7 +9,7 @@ use std::iter::Peekable;
 use std::str::Chars;
 
 // To be done: fix risen complexity after error fixes.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Token {
     Dot,
     Comma,

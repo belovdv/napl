@@ -38,7 +38,9 @@ Initial version is implemented. Current version:
 
 - has basic diagnostic, but,
 
-- wasn't tested well.
+- wasn't tested well,
+
+- has too deep tree representation.
 
 #### AST
 

@@ -1,19 +1,9 @@
-class (some class)
-      some property
-      another
-  . simplest test
-
 fn func() -> (T)
-      . inner
       fn <-- is simple
-  let a 3 (is a "hello world \t \n \\ \" ok? ")
-  for i in std.range.range(4)
-    do something
-          maybe it will help
-      extend (doing [1 + 2345])
-      extend doing 2
+  (("hello world \t \n \\ \" is ok? ".right))
+        extend (doing [1 + 2345])
   return
 
 .fn test_set()
-  { gen 3 }.map(?).fold(+)
+  { gen 3 }.map(?).fold(+) ?
     .read .int

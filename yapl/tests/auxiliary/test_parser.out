@@ -1,528 +1,541 @@
 [
     Line {
         sent: Sent {
-            sent: [
-                Expr {
-                    expr: Reference(Symbol(0: "class")),
-                    span: Span(0, 5),
+            chains: [
+                Chain {
+                    chain: [
+                        Expr {
+                            expr: Symbol(
+                                Symbol(0: "fn"),
+                            ),
+                            span: Span(0, 2),
+                        },
+                    ],
+                    span: Span(0, 2),
                 },
-                Expr {
-                    expr: Bracket {
-                        ty: Round,
-                        inner: [
-                            Sent {
-                                sent: [
-                                    Expr {
-                                        expr: Reference(Symbol(1: "some")),
-                                        span: Span(7, 11),
-                                    },
-                                    Expr {
-                                        expr: Reference(Symbol(0: "class")),
-                                        span: Span(12, 17),
+                Chain {
+                    chain: [
+                        Expr {
+                            expr: Symbol(
+                                Symbol(1: "func"),
+                            ),
+                            span: Span(3, 7),
+                        },
+                        Expr {
+                            expr: Bracket {
+                                ty: Round,
+                                inner: [],
+                            },
+                            span: Span(7, 9),
+                        },
+                    ],
+                    span: Span(3, 9),
+                },
+                Chain {
+                    chain: [
+                        Expr {
+                            expr: Symbol(
+                                Symbol(2: "->"),
+                            ),
+                            span: Span(10, 12),
+                        },
+                    ],
+                    span: Span(10, 12),
+                },
+                Chain {
+                    chain: [
+                        Expr {
+                            expr: Bracket {
+                                ty: Round,
+                                inner: [
+                                    Sent {
+                                        chains: [
+                                            Chain {
+                                                chain: [
+                                                    Expr {
+                                                        expr: Symbol(
+                                                            Symbol(3: "T"),
+                                                        ),
+                                                        span: Span(14, 15),
+                                                    },
+                                                ],
+                                                span: Span(14, 15),
+                                            },
+                                        ],
+                                        span: Span(14, 15),
                                     },
                                 ],
-                                span: Span(7, 17),
                             },
-                        ],
-                    },
-                    span: Span(6, 18),
+                            span: Span(13, 16),
+                        },
+                    ],
+                    span: Span(13, 16),
                 },
             ],
-            span: Span(0, 18),
+            span: Span(0, 16),
         },
         extension: [
             Line {
                 sent: Sent {
-                    sent: [
-                        Expr {
-                            expr: Reference(Symbol(1: "some")),
-                            span: Span(25, 29),
+                    chains: [
+                        Chain {
+                            chain: [
+                                Expr {
+                                    expr: Symbol(
+                                        Symbol(0: "fn"),
+                                    ),
+                                    span: Span(23, 25),
+                                },
+                            ],
+                            span: Span(23, 25),
                         },
-                        Expr {
-                            expr: Reference(Symbol(2: "property")),
-                            span: Span(30, 38),
+                        Chain {
+                            chain: [
+                                Expr {
+                                    expr: Symbol(
+                                        Symbol(4: "<--"),
+                                    ),
+                                    span: Span(26, 29),
+                                },
+                            ],
+                            span: Span(26, 29),
+                        },
+                        Chain {
+                            chain: [
+                                Expr {
+                                    expr: Symbol(
+                                        Symbol(5: "is"),
+                                    ),
+                                    span: Span(30, 32),
+                                },
+                            ],
+                            span: Span(30, 32),
+                        },
+                        Chain {
+                            chain: [
+                                Expr {
+                                    expr: Symbol(
+                                        Symbol(6: "simple"),
+                                    ),
+                                    span: Span(33, 39),
+                                },
+                            ],
+                            span: Span(33, 39),
                         },
                     ],
-                    span: Span(25, 38),
+                    span: Span(23, 39),
                 },
                 extension: [],
                 block: [],
-                span: Span(25, 38),
-            },
-            Line {
-                sent: Sent {
-                    sent: [
-                        Expr {
-                            expr: Reference(Symbol(3: "another")),
-                            span: Span(45, 52),
-                        },
-                    ],
-                    span: Span(45, 52),
-                },
-                extension: [],
-                block: [],
-                span: Span(45, 52),
-            },
-        ],
-        block: [],
-        span: Span(0, 52),
-    },
-    Line {
-        sent: Sent {
-            sent: [
-                Expr {
-                    expr: Reference(Symbol(6: "fn")),
-                    span: Span(72, 74),
-                },
-                Expr {
-                    expr: Reference(Symbol(7: "func")),
-                    span: Span(75, 79),
-                },
-                Expr {
-                    expr: Bracket {
-                        ty: Round,
-                        inner: [],
-                    },
-                    span: Span(79, 81),
-                },
-                Expr {
-                    expr: Reference(Symbol(8: "->")),
-                    span: Span(82, 84),
-                },
-                Expr {
-                    expr: Bracket {
-                        ty: Round,
-                        inner: [
-                            Sent {
-                                sent: [
-                                    Expr {
-                                        expr: Reference(Symbol(9: "T")),
-                                        span: Span(86, 87),
-                                    },
-                                ],
-                                span: Span(86, 87),
-                            },
-                        ],
-                    },
-                    span: Span(85, 88),
-                },
-            ],
-            span: Span(72, 88),
-        },
-        extension: [
-            Line {
-                sent: Sent {
-                    sent: [
-                        Expr {
-                            expr: Reference(Symbol(6: "fn")),
-                            span: Span(109, 111),
-                        },
-                        Expr {
-                            expr: Reference(Symbol(11: "<--")),
-                            span: Span(112, 115),
-                        },
-                        Expr {
-                            expr: Reference(Symbol(12: "is")),
-                            span: Span(116, 118),
-                        },
-                        Expr {
-                            expr: Reference(Symbol(13: "simple")),
-                            span: Span(119, 125),
-                        },
-                    ],
-                    span: Span(109, 125),
-                },
-                extension: [],
-                block: [],
-                span: Span(109, 125),
+                span: Span(23, 39),
             },
         ],
         block: [
             Line {
                 sent: Sent {
-                    sent: [
-                        Expr {
-                            expr: Reference(Symbol(14: "let")),
-                            span: Span(128, 131),
-                        },
-                        Expr {
-                            expr: Reference(Symbol(15: "a")),
-                            span: Span(132, 133),
-                        },
-                        Expr {
-                            expr: LitInt(
-                                3,
-                            ),
-                            span: Span(134, 135),
-                        },
-                        Expr {
-                            expr: Bracket {
-                                ty: Round,
-                                inner: [
-                                    Sent {
-                                        sent: [
-                                            Expr {
-                                                expr: Reference(Symbol(12: "is")),
-                                                span: Span(137, 139),
-                                            },
-                                            Expr {
-                                                expr: Reference(Symbol(15: "a")),
-                                                span: Span(140, 141),
-                                            },
-                                            Expr {
-                                                expr: LitStr(
-                                                    "hello world \t \n \\ \" ok? ",
-                                                ),
-                                                span: Span(142, 172),
+                    chains: [
+                        Chain {
+                            chain: [
+                                Expr {
+                                    expr: Bracket {
+                                        ty: Round,
+                                        inner: [
+                                            Sent {
+                                                chains: [
+                                                    Chain {
+                                                        chain: [
+                                                            Expr {
+                                                                expr: Bracket {
+                                                                    ty: Round,
+                                                                    inner: [
+                                                                        Sent {
+                                                                            chains: [
+                                                                                Chain {
+                                                                                    chain: [
+                                                                                        Expr {
+                                                                                            expr: LitStr(
+                                                                                                "hello world \t \n \\ \" is ok? ",
+                                                                                            ),
+                                                                                            span: Span(44, 77),
+                                                                                        },
+                                                                                        Expr {
+                                                                                            expr: Dot,
+                                                                                            span: Span(77, 78),
+                                                                                        },
+                                                                                        Expr {
+                                                                                            expr: Symbol(
+                                                                                                Symbol(7: "right"),
+                                                                                            ),
+                                                                                            span: Span(78, 83),
+                                                                                        },
+                                                                                    ],
+                                                                                    span: Span(44, 83),
+                                                                                },
+                                                                            ],
+                                                                            span: Span(44, 83),
+                                                                        },
+                                                                    ],
+                                                                },
+                                                                span: Span(43, 84),
+                                                            },
+                                                        ],
+                                                        span: Span(43, 84),
+                                                    },
+                                                ],
+                                                span: Span(43, 84),
                                             },
                                         ],
-                                        span: Span(137, 172),
                                     },
-                                ],
-                            },
-                            span: Span(136, 173),
-                        },
-                    ],
-                    span: Span(128, 173),
-                },
-                extension: [],
-                block: [],
-                span: Span(128, 173),
-            },
-            Line {
-                sent: Sent {
-                    sent: [
-                        Expr {
-                            expr: Reference(Symbol(16: "for")),
-                            span: Span(176, 179),
-                        },
-                        Expr {
-                            expr: Reference(Symbol(17: "i")),
-                            span: Span(180, 181),
-                        },
-                        Expr {
-                            expr: Reference(Symbol(18: "in")),
-                            span: Span(182, 184),
-                        },
-                        Expr {
-                            expr: Chain {
-                                from: Expr {
-                                    expr: Reference(Symbol(19: "std")),
-                                    span: Span(185, 188),
-                                },
-                                with: [
-                                    Symbol(20: "range"),
-                                    Symbol(20: "range"),
-                                ],
-                            },
-                            span: Span(185, 200),
-                        },
-                        Expr {
-                            expr: Bracket {
-                                ty: Round,
-                                inner: [
-                                    Sent {
-                                        sent: [
-                                            Expr {
-                                                expr: LitInt(
-                                                    4,
-                                                ),
-                                                span: Span(201, 202),
-                                            },
-                                        ],
-                                        span: Span(201, 202),
-                                    },
-                                ],
-                            },
-                            span: Span(200, 203),
-                        },
-                    ],
-                    span: Span(176, 203),
-                },
-                extension: [],
-                block: [
-                    Line {
-                        sent: Sent {
-                            sent: [
-                                Expr {
-                                    expr: Reference(Symbol(21: "do")),
-                                    span: Span(208, 210),
-                                },
-                                Expr {
-                                    expr: Reference(Symbol(22: "something")),
-                                    span: Span(211, 220),
+                                    span: Span(42, 85),
                                 },
                             ],
-                            span: Span(208, 220),
+                            span: Span(42, 85),
                         },
-                        extension: [
-                            Line {
-                                sent: Sent {
-                                    sent: [
+                    ],
+                    span: Span(42, 85),
+                },
+                extension: [
+                    Line {
+                        sent: Sent {
+                            chains: [
+                                Chain {
+                                    chain: [
                                         Expr {
-                                            expr: Reference(Symbol(23: "maybe")),
-                                            span: Span(231, 236),
-                                        },
-                                        Expr {
-                                            expr: Reference(Symbol(24: "it")),
-                                            span: Span(237, 239),
-                                        },
-                                        Expr {
-                                            expr: Reference(Symbol(25: "will")),
-                                            span: Span(240, 244),
-                                        },
-                                        Expr {
-                                            expr: Reference(Symbol(26: "help")),
-                                            span: Span(245, 249),
+                                            expr: Symbol(
+                                                Symbol(8: "extend"),
+                                            ),
+                                            span: Span(94, 100),
                                         },
                                     ],
-                                    span: Span(231, 249),
+                                    span: Span(94, 100),
                                 },
-                                extension: [],
-                                block: [],
-                                span: Span(231, 249),
-                            },
-                        ],
-                        block: [
-                            Line {
-                                sent: Sent {
-                                    sent: [
-                                        Expr {
-                                            expr: Reference(Symbol(27: "extend")),
-                                            span: Span(256, 262),
-                                        },
+                                Chain {
+                                    chain: [
                                         Expr {
                                             expr: Bracket {
                                                 ty: Round,
                                                 inner: [
                                                     Sent {
-                                                        sent: [
-                                                            Expr {
-                                                                expr: Reference(Symbol(28: "doing")),
-                                                                span: Span(264, 269),
+                                                        chains: [
+                                                            Chain {
+                                                                chain: [
+                                                                    Expr {
+                                                                        expr: Symbol(
+                                                                            Symbol(9: "doing"),
+                                                                        ),
+                                                                        span: Span(102, 107),
+                                                                    },
+                                                                ],
+                                                                span: Span(102, 107),
                                                             },
-                                                            Expr {
-                                                                expr: Bracket {
-                                                                    ty: Square,
-                                                                    inner: [
-                                                                        Sent {
-                                                                            sent: [
-                                                                                Expr {
-                                                                                    expr: LitInt(
-                                                                                        1,
-                                                                                    ),
-                                                                                    span: Span(271, 272),
-                                                                                },
-                                                                                Expr {
-                                                                                    expr: Reference(Symbol(29: "+")),
-                                                                                    span: Span(273, 274),
-                                                                                },
-                                                                                Expr {
-                                                                                    expr: LitInt(
-                                                                                        2345,
-                                                                                    ),
-                                                                                    span: Span(275, 279),
+                                                            Chain {
+                                                                chain: [
+                                                                    Expr {
+                                                                        expr: Bracket {
+                                                                            ty: Square,
+                                                                            inner: [
+                                                                                Sent {
+                                                                                    chains: [
+                                                                                        Chain {
+                                                                                            chain: [
+                                                                                                Expr {
+                                                                                                    expr: LitInt(
+                                                                                                        1,
+                                                                                                    ),
+                                                                                                    span: Span(109, 110),
+                                                                                                },
+                                                                                            ],
+                                                                                            span: Span(109, 110),
+                                                                                        },
+                                                                                        Chain {
+                                                                                            chain: [
+                                                                                                Expr {
+                                                                                                    expr: Symbol(
+                                                                                                        Symbol(10: "+"),
+                                                                                                    ),
+                                                                                                    span: Span(111, 112),
+                                                                                                },
+                                                                                            ],
+                                                                                            span: Span(111, 112),
+                                                                                        },
+                                                                                        Chain {
+                                                                                            chain: [
+                                                                                                Expr {
+                                                                                                    expr: LitInt(
+                                                                                                        2345,
+                                                                                                    ),
+                                                                                                    span: Span(113, 117),
+                                                                                                },
+                                                                                            ],
+                                                                                            span: Span(113, 117),
+                                                                                        },
+                                                                                    ],
+                                                                                    span: Span(109, 117),
                                                                                 },
                                                                             ],
-                                                                            span: Span(271, 279),
                                                                         },
-                                                                    ],
-                                                                },
-                                                                span: Span(270, 280),
+                                                                        span: Span(108, 118),
+                                                                    },
+                                                                ],
+                                                                span: Span(108, 118),
                                                             },
                                                         ],
-                                                        span: Span(264, 280),
+                                                        span: Span(102, 118),
                                                     },
                                                 ],
                                             },
-                                            span: Span(263, 281),
+                                            span: Span(101, 119),
                                         },
                                     ],
-                                    span: Span(256, 281),
+                                    span: Span(101, 119),
                                 },
-                                extension: [],
-                                block: [],
-                                span: Span(256, 281),
-                            },
-                            Line {
-                                sent: Sent {
-                                    sent: [
-                                        Expr {
-                                            expr: Reference(Symbol(27: "extend")),
-                                            span: Span(288, 294),
-                                        },
-                                        Expr {
-                                            expr: Reference(Symbol(28: "doing")),
-                                            span: Span(295, 300),
-                                        },
-                                        Expr {
-                                            expr: LitInt(
-                                                2,
-                                            ),
-                                            span: Span(301, 302),
-                                        },
-                                    ],
-                                    span: Span(288, 302),
-                                },
-                                extension: [],
-                                block: [],
-                                span: Span(288, 302),
-                            },
-                        ],
-                        span: Span(208, 302),
+                            ],
+                            span: Span(94, 119),
+                        },
+                        extension: [],
+                        block: [],
+                        span: Span(94, 119),
                     },
                 ],
-                span: Span(176, 302),
+                block: [],
+                span: Span(0, 119),
             },
             Line {
                 sent: Sent {
-                    sent: [
-                        Expr {
-                            expr: Reference(Symbol(30: "return")),
-                            span: Span(305, 311),
+                    chains: [
+                        Chain {
+                            chain: [
+                                Expr {
+                                    expr: Symbol(
+                                        Symbol(11: "return"),
+                                    ),
+                                    span: Span(122, 128),
+                                },
+                            ],
+                            span: Span(122, 128),
                         },
                     ],
-                    span: Span(305, 311),
+                    span: Span(122, 128),
                 },
                 extension: [],
                 block: [],
-                span: Span(305, 311),
+                span: Span(122, 128),
             },
         ],
-        span: Span(72, 311),
+        span: Span(0, 128),
     },
     Line {
         sent: Sent {
-            sent: [
-                Expr {
-                    expr: Inner(
-                        Symbol(6: "fn"),
-                    ),
-                    span: Span(313, 316),
+            chains: [
+                Chain {
+                    chain: [
+                        Expr {
+                            expr: Dot,
+                            span: Span(130, 131),
+                        },
+                        Expr {
+                            expr: Symbol(
+                                Symbol(0: "fn"),
+                            ),
+                            span: Span(131, 133),
+                        },
+                    ],
+                    span: Span(130, 133),
                 },
-                Expr {
-                    expr: Reference(Symbol(31: "test_set")),
-                    span: Span(317, 325),
-                },
-                Expr {
-                    expr: Bracket {
-                        ty: Round,
-                        inner: [],
-                    },
-                    span: Span(325, 327),
+                Chain {
+                    chain: [
+                        Expr {
+                            expr: Symbol(
+                                Symbol(12: "test_set"),
+                            ),
+                            span: Span(134, 142),
+                        },
+                        Expr {
+                            expr: Bracket {
+                                ty: Round,
+                                inner: [],
+                            },
+                            span: Span(142, 144),
+                        },
+                    ],
+                    span: Span(134, 144),
                 },
             ],
-            span: Span(313, 327),
+            span: Span(130, 144),
         },
         extension: [],
         block: [
             Line {
                 sent: Sent {
-                    sent: [
-                        Expr {
-                            expr: Chain {
-                                from: Expr {
+                    chains: [
+                        Chain {
+                            chain: [
+                                Expr {
                                     expr: Bracket {
                                         ty: Curly,
                                         inner: [
                                             Sent {
-                                                sent: [
-                                                    Expr {
-                                                        expr: Reference(Symbol(32: "gen")),
-                                                        span: Span(332, 335),
+                                                chains: [
+                                                    Chain {
+                                                        chain: [
+                                                            Expr {
+                                                                expr: Symbol(
+                                                                    Symbol(13: "gen"),
+                                                                ),
+                                                                span: Span(149, 152),
+                                                            },
+                                                        ],
+                                                        span: Span(149, 152),
                                                     },
-                                                    Expr {
-                                                        expr: LitInt(
-                                                            3,
-                                                        ),
-                                                        span: Span(336, 337),
+                                                    Chain {
+                                                        chain: [
+                                                            Expr {
+                                                                expr: LitInt(
+                                                                    3,
+                                                                ),
+                                                                span: Span(153, 154),
+                                                            },
+                                                        ],
+                                                        span: Span(153, 154),
                                                     },
                                                 ],
-                                                span: Span(332, 337),
+                                                span: Span(149, 154),
                                             },
                                         ],
                                     },
-                                    span: Span(330, 339),
+                                    span: Span(147, 156),
                                 },
-                                with: [
-                                    Symbol(33: "map"),
-                                ],
-                            },
-                            span: Span(330, 343),
-                        },
-                        Expr {
-                            expr: Chain {
-                                from: Expr {
+                                Expr {
+                                    expr: Dot,
+                                    span: Span(156, 157),
+                                },
+                                Expr {
+                                    expr: Symbol(
+                                        Symbol(14: "map"),
+                                    ),
+                                    span: Span(157, 160),
+                                },
+                                Expr {
                                     expr: Bracket {
                                         ty: Round,
                                         inner: [
                                             Sent {
-                                                sent: [
-                                                    Expr {
-                                                        expr: Reference(Symbol(34: "?")),
-                                                        span: Span(344, 345),
+                                                chains: [
+                                                    Chain {
+                                                        chain: [
+                                                            Expr {
+                                                                expr: Symbol(
+                                                                    Symbol(15: "?"),
+                                                                ),
+                                                                span: Span(161, 162),
+                                                            },
+                                                        ],
+                                                        span: Span(161, 162),
                                                     },
                                                 ],
-                                                span: Span(344, 345),
+                                                span: Span(161, 162),
                                             },
                                         ],
                                     },
-                                    span: Span(343, 346),
+                                    span: Span(160, 163),
                                 },
-                                with: [
-                                    Symbol(35: "fold"),
-                                ],
-                            },
-                            span: Span(343, 351),
-                        },
-                        Expr {
-                            expr: Bracket {
-                                ty: Round,
-                                inner: [
-                                    Sent {
-                                        sent: [
-                                            Expr {
-                                                expr: Reference(Symbol(29: "+")),
-                                                span: Span(352, 353),
+                                Expr {
+                                    expr: Dot,
+                                    span: Span(163, 164),
+                                },
+                                Expr {
+                                    expr: Symbol(
+                                        Symbol(16: "fold"),
+                                    ),
+                                    span: Span(164, 168),
+                                },
+                                Expr {
+                                    expr: Bracket {
+                                        ty: Round,
+                                        inner: [
+                                            Sent {
+                                                chains: [
+                                                    Chain {
+                                                        chain: [
+                                                            Expr {
+                                                                expr: Symbol(
+                                                                    Symbol(10: "+"),
+                                                                ),
+                                                                span: Span(169, 170),
+                                                            },
+                                                        ],
+                                                        span: Span(169, 170),
+                                                    },
+                                                ],
+                                                span: Span(169, 170),
                                             },
                                         ],
-                                        span: Span(352, 353),
                                     },
-                                ],
-                            },
-                            span: Span(351, 354),
+                                    span: Span(168, 171),
+                                },
+                            ],
+                            span: Span(147, 171),
+                        },
+                        Chain {
+                            chain: [
+                                Expr {
+                                    expr: Symbol(
+                                        Symbol(15: "?"),
+                                    ),
+                                    span: Span(172, 173),
+                                },
+                            ],
+                            span: Span(172, 173),
                         },
                     ],
-                    span: Span(330, 354),
+                    span: Span(147, 173),
                 },
                 extension: [],
                 block: [
                     Line {
                         sent: Sent {
-                            sent: [
-                                Expr {
-                                    expr: Inner(
-                                        Symbol(36: "read"),
-                                    ),
-                                    span: Span(359, 364),
+                            chains: [
+                                Chain {
+                                    chain: [
+                                        Expr {
+                                            expr: Dot,
+                                            span: Span(178, 179),
+                                        },
+                                        Expr {
+                                            expr: Symbol(
+                                                Symbol(17: "read"),
+                                            ),
+                                            span: Span(179, 183),
+                                        },
+                                    ],
+                                    span: Span(178, 183),
                                 },
-                                Expr {
-                                    expr: Inner(
-                                        Symbol(37: "int"),
-                                    ),
-                                    span: Span(365, 369),
+                                Chain {
+                                    chain: [
+                                        Expr {
+                                            expr: Dot,
+                                            span: Span(184, 185),
+                                        },
+                                        Expr {
+                                            expr: Symbol(
+                                                Symbol(18: "int"),
+                                            ),
+                                            span: Span(185, 188),
+                                        },
+                                    ],
+                                    span: Span(184, 188),
                                 },
                             ],
-                            span: Span(359, 369),
+                            span: Span(178, 188),
                         },
                         extension: [],
                         block: [],
-                        span: Span(359, 369),
+                        span: Span(178, 188),
                     },
                 ],
-                span: Span(330, 369),
+                span: Span(0, 188),
             },
         ],
-        span: Span(313, 369),
+        span: Span(0, 188),
     },
 ]

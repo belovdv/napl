@@ -11,10 +11,9 @@
 .fn read_and_check_if_all_more_3_mod_7(arg: .unsigned) -> .string
   .fn mod_7(a: .int) -> .int
     % a 7
-  .fn more_3(a: .int) -> .bool
-    > a 3
   = result { gen arg }.map(more_3).fold(+)
-    mod_2 .read(.int)
+        .where more_3(a) = > a 3
+    mod_7 .read(.int)
   match result
     .true
       "yes"

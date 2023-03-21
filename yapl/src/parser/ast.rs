@@ -4,13 +4,10 @@ use crate::common::symbol::Symbol;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(derive_new::new, getset::Getters)]
+#[derive(derive_new::new)]
 pub struct File<'file> {
-    #[getset(get = "pub")]
     context: &'file location::File,
-    #[getset(get = "pub")]
-    roots: Vec<Line>,
-    #[getset(get = "pub")]
+    pub roots: Vec<Line>,
     span: Span,
 }
 

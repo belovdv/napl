@@ -8,7 +8,7 @@ use crate::common::error::Result;
 
 // To be done: `Result` is here to handle possible incompatibility. Is it usefull?
 pub fn parser2ast(parser: &parser_ast::File) -> Result<Vec<ast::Line>> {
-    parser.roots().iter().map(p2a_line).collect()
+    parser.roots.iter().map(p2a_line).collect()
 }
 
 fn p2a_line(line: &parser_ast::Line) -> Result<ast::Line> {

@@ -6,14 +6,14 @@ publish = false
 
 [dependencies]
 derive-new = "0.5"
-getset = "0.1.2"
 serde = { version = "1.0.152", features = ["derive"] }
-serde_json = "1.0.93"
-daggy = "0.8"
-lazy_static = "1.4.0"
-thiserror = "1.0.39"
-codemap = "0.1.3"
-codemap-diagnostic = "0.1.1"
+# getset = "0.1.2"
+# serde_json = "1.0.93"
+# daggy = "0.8"
+# lazy_static = "1.4.0"
+# thiserror = "1.0.39"
+# codemap = "0.1.3"
+# codemap-diagnostic = "0.1.1"
 
 [lib]
 name = "yapl"

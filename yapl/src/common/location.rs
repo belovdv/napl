@@ -4,11 +4,9 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-#[derive(getset::Getters)]
 pub struct File {
     path: PathBuf,
-    #[getset(get = "pub")]
-    code: String,
+    pub code: String,
     lines: Vec<String>,
 }
 
@@ -79,11 +77,9 @@ pub trait HasPosition {
 }
 
 // Note: don't forget, it has mean only in one `Context`.
-#[derive(Default, Clone, Copy, PartialEq, getset::CopyGetters, Serialize, Deserialize)]
+#[derive(Default, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub struct Span {
-    #[getset(get_copy = "pub")]
-    begin: Position,
-    #[getset(get_copy = "pub")]
+    pub begin: Position,
     end: Position,
 }
 

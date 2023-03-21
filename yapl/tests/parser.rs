@@ -15,7 +15,7 @@ fn parser() {
             panic!();
         }
     };
-    let result = format!("{:#?}", &parsed.roots());
+    let result = format!("{:#?}", &parsed.roots);
 
     // This contains more or less all patterns, so remove unit tests.
     // Since previous version: changed `Line::span`, `LitI`->`LitInt`.

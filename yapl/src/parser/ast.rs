@@ -1,7 +1,5 @@
-// To be done: is pub necessary?
-pub use super::symbol::BracketType;
-
 use crate::common::location::{self, implement_has_span, Span};
+use crate::common::other::BracketType;
 use crate::common::symbol::Symbol;
 
 use serde::{Deserialize, Serialize};

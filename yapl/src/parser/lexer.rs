@@ -1,9 +1,10 @@
 use crate::common::error::{raise_error, Result};
 use crate::common::location::{Position, Span};
+use crate::common::other::BracketType;
 use crate::common::symbol::Symbol;
 
 use super::errors::{ParseInt, UnexpectedEOS, UnexpectedSymbol, UnsupportedSymbol};
-use super::symbol::{BracketType, SymbolType};
+use super::symbol::SymbolType;
 
 use std::iter::Peekable;
 use std::str::Chars;

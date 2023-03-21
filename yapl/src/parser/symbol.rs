@@ -1,3 +1,5 @@
+use crate::common::other::BracketType;
+
 /// Basic grammatical rules.
 /// This is, if it will be possible, will be simplified.
 #[derive(Debug, PartialEq, Clone, Copy, serde::Serialize, serde::Deserialize)]
@@ -36,13 +38,6 @@ pub enum SymbolType {
     /// Any other unicode.
     /// Forbidden to be used (except `string`).
     Other(char),
-}
-
-#[derive(Debug, PartialEq, Clone, Copy, serde::Deserialize, serde::Serialize)]
-pub enum BracketType {
-    Round,
-    Square,
-    Curly,
 }
 
 impl From<Option<char>> for SymbolType {

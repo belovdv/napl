@@ -3,9 +3,11 @@
 mod common;
 mod glue;
 
-// To be done: remove this `pub`.
+// To be done: remove `pub`.
 pub mod ast;
 
+// To be done: remove `unused`.
+#[allow(unused)]
 mod dfg;
 mod parser;
 

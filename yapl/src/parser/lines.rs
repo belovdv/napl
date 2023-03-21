@@ -1,17 +1,17 @@
 use std::iter::Peekable;
 use std::vec;
 
-use super::ast::{Chain, Expr, Line, Sent};
+use super::ast::{Chain, Expr, ExprT, Line, Sent};
 use super::errors::{
     ClosedBracket, ClosingBracketNotFound, NewLineOnFileEnd, UnexpectedEOL, UnexpectedToken,
     WrongLineOffset,
 };
 use super::lexer::{Lexer, Token};
-use super::symbol::{offset, BracketType};
+use super::symbol::offset;
 
 use crate::common::error::{raise_error, Error};
 use crate::common::location::Span;
-use crate::parser::ast::ExprT;
+use crate::common::other::BracketType;
 
 // To be done: fix risen code complexity.
 

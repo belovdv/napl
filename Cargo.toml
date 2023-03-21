@@ -1,4 +1,2 @@
 [workspace]
-members = [
-  "yapl"
-]
+members = ["yapl"]
